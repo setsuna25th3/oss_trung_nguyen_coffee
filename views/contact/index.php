@@ -18,8 +18,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #fff1e0;
             color: #333;
-            padding-top: 150px;
+            padding-top: 125px;
         }
+
 
         .page-header {
             position: relative;
@@ -33,12 +34,30 @@
             align-items: center;
         }
 
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .page-header h1,
+        .page-header .breadcrumb {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            color: white;
+        }
+
         .page-header h1 {
-            color: #000;
-            font-family: 'Times New Roman', Times, serif;
-            font-weight: bolder;
-            letter-spacing: 0.5px;
             font-size: 48px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
         }
 
         .breadcrumb {
@@ -50,18 +69,18 @@
             gap: 10px;
             margin-top: 15px;
             flex-wrap: wrap;
-            font-size: 20px;
+            font-size: 18px;
         }
 
         .breadcrumb a {
             color: white;
             text-decoration: none;
             transition: color 0.3s;
-            font-weight: 500;
+            font-weight: 400;
         }
 
         .breadcrumb a:hover {
-            color: yellowgreen;
+            color: orange;
         }
 
         .breadcrumb .active {
@@ -176,10 +195,10 @@
         <h1 class="display-6 fw-bold font-monospace">Liên hệ</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0">
-                <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a href="../home/index.php">Trang chủ</a></li>
                 <span class="separator">/</span>
 
-                <li class="breadcrumb-item"><a href="store.php">Cửa hàng</a></li>
+                <li class="breadcrumb-item"><a href="../product/index.php">Cửa hàng</a></li>
                 <span class="separator">/</span>
 
                 <li class="breadcrumb-item active" aria-current="page">Liên hệ</li>

@@ -38,20 +38,87 @@ unset($_SESSION['ProfileSuccessMessage'], $_SESSION['ProfileErrorMessage']);
         }
 
         body {
+            padding-top: 125px;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(to bottom, #fff8e1, #fff1e0);
             min-height: 100vh;
         }
 
-        #headerprofile {
-            background: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.7)),
-                url('https://images2.thanhnien.vn/528068263637045248/2024/1/25/e093e9cfc9027d6a142358d24d2ee350-65a11ac2af785880-17061562929701875684912.jpg') center/cover no-repeat;
-            height: 300px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        /* PAGE HEADER */
+        .page-header {
+            padding: 120px 0 60px;
+            background-image: url('https://images2.thanhnien.vn/528068263637045248/2024/1/25/e093e9cfc9027d6a142358d24d2ee350-65a11ac2af785880-17061562929701875684912.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            text-align: center;
             color: white;
+        }
+
+        .page-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            /* overlay tối */
+            z-index: 0;
+        }
+
+        .page-header h1,
+        .page-header .breadcrumb {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            font-size: 16px;
+        }
+
+        .breadcrumb a {
+            color: #fff1e0;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .breadcrumb a:hover {
+            color: #ffb300;
+        }
+
+        .breadcrumb .active {
+            color: #ffb300;
+            font-weight: bold;
+        }
+
+        .breadcrumb span.separator {
+            color: white;
+        }
+
+        /* Gạch nhỏ trang trí phía dưới header */
+        .page-header::after {
+            content: "";
+            width: 80px;
+            height: 4px;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 2px;
         }
 
         .profile-card {
@@ -150,16 +217,17 @@ unset($_SESSION['ProfileSuccessMessage'], $_SESSION['ProfileErrorMessage']);
     <?php include '../header.php'; ?>
 
     <!-- Header -->
-    <div class="container-fluid text-white text-center" id="headerprofile">
+    <div class="container-fluid page-header">
         <h1 class="display-4 fw-bold">Thông tin cá nhân</h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb justify-content-center mb-0">
-                <li class="breadcrumb-item"><a href="index.php" class="text-white opacity-75">Trang chủ</a></li>
-                <li class="breadcrumb-item"><a href="cart.php" class="text-white opacity-75">Giỏ hàng</a></li>
-                <li class="breadcrumb-item active text-warning">Hồ sơ</li>
-            </ol>
-        </nav>
+        <ul class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../home/index.php">Trang chủ</a></li>
+            <span class="separator">/</span>
+            <li class="breadcrumb-item"><a href="../cart/index.php">Giỏ hàng</a></li>
+            <span class="separator">/</span>
+            <li class="breadcrumb-item active">Hồ sơ</li>
+        </ul>
     </div>
+
 
     <div class="container py-5">
         <div class="row justify-content-center">

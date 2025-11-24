@@ -235,9 +235,8 @@
     <div class="container-fluid page-header">
         <h1>Giỏ hàng</h1>
         <ul class="breadcrumb">
-            <li><a href="index.php">Trang chủ</a></li><span class="separator">/</span>
-            <li><a href="cart.php">Giỏ hàng</a></li><span class="separator">/</span>
-            <li><a href="contact.php">Liên hệ</a></li><span class="separator">/</span>
+            <li><a href="../home/index.php">Trang chủ</a></li><span class="separator">/</span>
+            <li><a href="../contact/index.php">Liên hệ</a></li><span class="separator">/</span>
             <li class="active">Cửa hàng</li>
         </ul>
     </div>
@@ -247,12 +246,13 @@
             <div class="sidebar-section">
                 <h3>Danh mục</h3>
                 <ul>
-                    <li><a href="#">Cà phê sữa đá</a></li>
+                    <!-- load dữ liệu -->
+                    <!-- <li><a href="#">Cà phê sữa đá</a></li>
                     <li><a href="#">Trà đào</a></li>
                     <li><a href="#">Nước đá cam</a></li>
                     <li><a href="#">Cà phê đen</a></li>
                     <li><a href="#">Bánh mì</a></li>
-                    <li><a href="#">Bánh flan</a></li>
+                    <li><a href="#">Bánh flan</a></li> -->
                 </ul>
             </div>
         </aside>
@@ -272,12 +272,13 @@
                 <tbody>
                     <?php for ($i = 1; $i <= 4; $i++): ?>
                         <tr>
-                            <td><img src="Images/SanPham/sample.jpg" class="product-img" alt="Sản phẩm"></td>
+                            <!-- load dữ liệu -->
+                            <!-- <td><img src="Images/SanPham/sample.jpg" class="product-img" alt="Sản phẩm"></td>
                             <td>Cà phê sữa đá <?= $i ?></td>
                             <td>25.000 VND</td>
                             <td>1</td>
                             <td>25.000 VND</td>
-                            <td><button class="btn">Xóa</button></td>
+                            <td><button class="btn">Xóa</button></td> -->
                         </tr>
                     <?php endfor; ?>
                 </tbody>
@@ -285,8 +286,10 @@
 
             <div class="checkout-box">
                 <h4>Tổng tiền:</h4>
-                <p>100.000 VND</p>
+                <!-- xử lý tính -->
+                <!-- <p>100.000 VND</p> -->
                 <button class="btn">Thanh toán</button>
+                <!-- xử lý thanh toán -->
             </div>
         </main>
     </div>

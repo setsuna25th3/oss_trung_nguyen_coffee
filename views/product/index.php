@@ -17,7 +17,6 @@
             background-color: #fff1e0;
             color: #333;
             padding-top: 150px;
-            /* space for header/menu */
         }
 
         /* PAGE HEADER */
@@ -223,7 +222,6 @@
             outline: none;
         }
 
-        /* PRODUCTS GRID */
         .products-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -302,7 +300,6 @@
             transform: translateY(-2px);
         }
 
-        /* PAGINATION */
         .pagination {
             display: flex;
             gap: 10px;
@@ -408,11 +405,11 @@
     <div class="container-fluid page-header">
         <h1 class="display-6 fw-bold font-monospace">Trung Nguyên Cà Phê</h1>
         <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="../home/index.php">Trang chủ</a></li>
             <span class="separator">/</span>
-            <li class="breadcrumb-item"><a href="cart.php">Giỏ hàng</a></li>
+            <li class="breadcrumb-item"><a href="../cart/index.php">Giỏ hàng</a></li>
             <span class="separator">/</span>
-            <li class="breadcrumb-item"><a href="contact.php">Liên hệ</a></li>
+            <li class="breadcrumb-item"><a href="../contact/index.php">Liên hệ</a></li>
             <span class="separator">/</span>
             <li class="breadcrumb-item active">Cửa hàng</li>
         </ul>
@@ -482,7 +479,7 @@
 
             <div class="sidebar-section">
                 <h3>Sản phẩm bán chạy</h3>
-                <!-- Lọc dựa trên đánh giá -->
+                <!-- Lọc dựa trên số lượng bán -->
 
                 <!-- <div class="featured-product">
                     <img src="Images/SanPham/sample.jpg" alt="Sản phẩm bán chạy">
@@ -495,9 +492,7 @@
             </div>
         </aside>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Filter/Search -->
             <div class="filter-bar">
                 <form method="get" action="#" class="search-container">
                     <input type="search" name="searchTerm" placeholder="Tìm kiếm sản phẩm...">
@@ -513,7 +508,6 @@
                 </form>
             </div>
 
-            <!-- Products Grid -->
             <div class="products-grid">
                 <?php for ($i = 1; $i <= 8; $i++): ?>
                     <div class="card">
@@ -529,7 +523,6 @@
                 <?php endfor; ?>
             </div>
 
-            <!-- Pagination -->
             <ul class="pagination">
                 <li><a href="#">«</a></li>
                 <li><a class="active" href="#">1</a></li>
@@ -541,7 +534,6 @@
         </main>
     </div>
 
-    <!-- Include footer -->
     <?php include '../footer.php'; ?>
 </body>
 
