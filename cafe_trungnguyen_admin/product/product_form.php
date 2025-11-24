@@ -86,10 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </p>
 
         <p>
-            <label>Tên ảnh:</label><br>
-            <input type="text" name="Img"
-                value="<?php echo htmlspecialchars($img); ?>">
+            <label>Ảnh (chọn file):</label>
+            <input type="file" name="ImageFile" accept="image/*">
             <br>
+            <input type="hidden" name="ExistingImg" value="<?php echo htmlspecialchars($img); ?>">
         </p>
 
         <p>

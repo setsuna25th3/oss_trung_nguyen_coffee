@@ -39,7 +39,7 @@ $result = $stmt->get_result();
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Quản lý mặt hàng (sản phẩm)</title>
+    <title>Quản lý mặt hàng</title>
     <style>
         body { font-family: Arial, sans-serif; }
         table { border-collapse: collapse; width: 100%; margin-top: 10px; }
@@ -51,7 +51,7 @@ $result = $stmt->get_result();
     </style>
 </head>
 <body>
-    <h1>Quản lý mặt hàng (sản phẩm)</h1>
+    <h1>Quản lý mặt hàng</h1>
 
     <div class="toolbar">
         <form method="get" action="product_list.php">
@@ -94,9 +94,9 @@ $result = $stmt->get_result();
                     <td><?php echo htmlspecialchars($row['CategoryTitle']); ?></td>
                     <td><?php echo number_format($row['Price'], 0, ',', '.'); ?> đ</td>
                     <td>
-                        <?php if (!empty($row['Img'])): ?>
-                            <img src="images/<?php echo htmlspecialchars($row['Img']); ?>" alt="">
-                        <?php endif; ?>
+                    <?php if (!empty($row['Img'])): ?>
+                        <img src="images/SanPham/<?php echo htmlspecialchars($row['Img']); ?>" alt="">
+                    <?php endif; ?>
                     </td>
                     <td>
                         <a href="product_form.php?id=<?php echo $row['Id']; ?>">Sửa</a> |
