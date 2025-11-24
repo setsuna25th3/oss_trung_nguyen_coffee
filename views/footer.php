@@ -5,6 +5,7 @@
             color: white;
             padding: 60px 80px 30px;
             font-size: 15px;
+            margin-top: auto
         }
 
         .footer-container {
@@ -79,10 +80,9 @@
         </div>
         <div class="footer-section">
             <h3>LIÊN KẾT NHANH</h3>
-            <a href="index.php">Trang chủ</a>
-            <a href="/oss_trung_nguyen_coffee/views/product/index.php">Cửa hàng</a>
-            <a href="#">Danh mục</a>
-            <a href="#">Liên hệ</a>
+            <a href="../home/index.php">Trang chủ</a>
+            <a href="../product/index.php">Cửa hàng</a>
+            <a href="../contact/index.php">Liên hệ</a>
         </div>
         <div class="footer-section">
             <h3>LIÊN HỆ</h3>

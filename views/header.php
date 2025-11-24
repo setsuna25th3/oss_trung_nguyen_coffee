@@ -1,223 +1,232 @@
-<!-- header.php -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<header>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
 
-        /* ===== TOP BAR ===== */
+    .top-bar {
+        background-color: #37474f;
+        color: white;
+        padding: 20px 60px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 14px;
+        border-radius: 0 0 30px 30px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+    }
+
+    .top-bar .left {
+        display: flex;
+        gap: 25px;
+    }
+
+    .top-bar .left span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .top-bar .right a {
+        color: white;
+        text-decoration: none;
+        padding: 5px 12px;
+        background-color: #455a64;
+        border-radius: 25px;
+        font-weight: 500;
+    }
+
+    .top-bar .right a:hover {
+        background-color: #546e7a;
+    }
+
+    .menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 80px;
+        background-color: white;
+        position: fixed;
+        top: 59px;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-nav a {
+        margin-right: 35px;
+        text-decoration: none;
+        color: #37474f;
+        font-weight: 600;
+        font-size: 20px;
+        transition: color 0.3s, transform 0.3s;
+        display: inline-block;
+    }
+
+    .menu-nav a:hover {
+        color: #ffb300;
+        transform: scale(1.1);
+    }
+
+    .menu-nav a.dropdown::after {
+        content: " ▼";
+        font-size: 10px;
+    }
+
+    .logo img {
+        height: 65px;
+    }
+
+    .menu-icons {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        font-size: 23px;
+        color: #37474f;
+    }
+
+    .menu-icons a {
+        color: #333;
+        text-decoration: none;
+        font-size: 20px;
+    }
+
+    .menu-icons a:hover {
+        color: brown;
+    }
+
+
+    .menu-icons .cart {
+        position: relative;
+    }
+
+    .menu-icons .cart sup {
+        position: absolute;
+        top: -8px;
+        right: -10px;
+        background: #ffb300;
+        color: white;
+        font-size: 12px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    @media(max-width:992px) {
         .top-bar {
-            background-color: #37474f;
-            color: white;
-            padding: 20px 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 14px;
-            border-radius: 0 0 30px 30px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
+            padding: 10px 30px;
+            border-radius: 0 0 20px 20px;
+            font-size: 12px;
         }
 
-        .top-bar .left {
-            display: flex;
-            gap: 25px;
-        }
-
-        .top-bar .left span {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .top-bar .right a {
-            color: white;
-            text-decoration: none;
-            padding: 5px 12px;
-            background-color: #455a64;
-            border-radius: 25px;
-            font-weight: 500;
-        }
-
-        .top-bar .right a:hover {
-            background-color: #546e7a;
-        }
-
-        /* ===== MENU ===== */
         .menu {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 80px;
-            background-color: white;
-            position: fixed;
-            top: 59px;
-            /* chiều cao top-bar */
-            left: 0;
-            width: 100%;
-            z-index: 999;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .menu-nav a {
-            margin-right: 35px;
-            text-decoration: none;
-            color: #37474f;
-            font-weight: 600;
-            font-size: 20px;
-            transition: color 0.3s, transform 0.3s;
-            display: inline-block;
+            font-size: 18px;
+            margin-right: 20px;
         }
+    }
 
-        .menu-nav a:hover {
-            color: #ffb300;
-            transform: scale(1.1);
-        }
-
-        .menu-nav a.dropdown::after {
-            content: " ▼";
-            font-size: 10px;
+    @media(max-width:576px) {
+        .menu-nav a {
+            font-size: 16px;
+            margin-right: 15px;
         }
 
         .logo img {
-            height: 65px;
+            height: 50px;
         }
+    }
 
-        .menu-icons {
-            display: flex;
-            align-items: center;
-            gap: 22px;
-            font-size: 23px;
-            color: #37474f;
-        }
+    .dropdown-menu {
+        position: relative;
+        display: inline-block;
+        padding-bottom: 10px;
+    }
 
-        .menu-icons .cart {
-            position: relative;
-        }
+    .dropdown-btn {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 20px;
+        color: #37474f;
+        display: inline-block;
+    }
 
-        .menu-icons .cart sup {
-            position: absolute;
-            top: -8px;
-            right: -10px;
-            background: #ffb300;
-            color: white;
-            font-size: 12px;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
+    .dropdown-btn:hover {
+        color: #ffb300;
+    }
 
-        @media(max-width:992px) {
-            .top-bar {
-                padding: 10px 30px;
-                border-radius: 0 0 20px 20px;
-                font-size: 12px;
-            }
+    .dropdown-list {
+        list-style: none;
+        position: absolute;
+        top: 28px;
+        left: 0;
+        background: white;
+        padding: 12px 0;
+        width: 220px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+        z-index: 9999;
+    }
 
-            .menu {
-                padding: 20px 40px;
-                flex-direction: column;
-                gap: 20px;
-            }
+    .dropdown-menu:hover .dropdown-list {
+        display: block;
+    }
 
-            .menu-nav a {
-                font-size: 18px;
-                margin-right: 20px;
-            }
-        }
+    .dropdown-list li a {
+        display: block;
+        padding: 10px 18px;
+        font-size: 17px;
+        color: #37474f;
+        text-decoration: none;
+    }
 
-        @media(max-width:576px) {
-            .menu-nav a {
-                font-size: 16px;
-                margin-right: 15px;
-            }
+    .dropdown-list li a:hover {
+        background-color: #ffb300;
+        color: white;
+    }
 
-            .logo img {
-                height: 50px;
-            }
-        }
+    .dropdown-menu,
+    .dropdown-menu a,
+    .dropdown-menu div,
+    .dropdown-btn {
+        border: none !important;
+        box-shadow: none !important;
+    }
+</style>
 
-        /* Dropdown */
-        .dropdown-menu {
-            position: relative;
-            display: inline-block;
-            padding-bottom: 10px;
-            /* giúp hover không bị mất */
-        }
+<header>
 
-        .dropdown-btn {
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 20px;
-            color: #37474f;
-            display: inline-block;
-        }
-
-        .dropdown-btn:hover {
-            color: #ffb300;
-        }
-
-        /* Danh sách dropdown */
-        .dropdown-list {
-            list-style: none;
-            position: absolute;
-            top: 28px;
-            /* giảm khoảng hở */
-            left: 0;
-            background: white;
-            padding: 12px 0;
-            width: 220px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            display: none;
-            z-index: 9999;
-        }
-
-        /* Hiện menu khi hover */
-        .dropdown-menu:hover .dropdown-list {
-            display: block;
-        }
-
-        .dropdown-list li a {
-            display: block;
-            padding: 10px 18px;
-            font-size: 17px;
-            color: #37474f;
-            text-decoration: none;
-        }
-
-        .dropdown-list li a:hover {
-            background-color: #ffb300;
-            color: white;
-        }
-    </style>
-
-    <!-- Top Bar -->
     <div class="top-bar">
         <div class="left">
             <span><i class="fas fa-map-marker-alt"></i> Trung Nguyên Coffee</span>
             <span><i class="fas fa-envelope"></i> contact@trungnguyencoffee.com</span>
         </div>
         <div class="right">
-            <a href="#">Đăng nhập</a> / <a href="#">Đăng ký</a>
+            <a href="../customer/login.php">Đăng nhập</a> / <a href="../customer/signup.php">Đăng ký</a>
         </div>
     </div>
 
-    <!-- Menu -->
     <div class="menu">
         <div class="logo">
             <img src="/oss_trung_nguyen_coffee/images/Images/Logo/logo.png" alt="Trung Nguyên Legend">
@@ -238,14 +247,17 @@
                 </ul>
             </div>
 
-            <a href="#">Liên hệ</a>
+            <a href="../contact/index.php">Liên hệ</a>
         </div>
 
         <div class="menu-icons">
-            <i class="fas fa-phone-alt"></i>
-            <span class="cart"><i class="fas fa-shopping-cart"></i><sup>0</sup></span>
-            <i class="fas fa-user"></i>
+            <a href="../contact/index.php"><i class="fas fa-phone-alt"></i></a>
+            <a href="../cart/index.php" class="cart">
+                <i class="fas fa-shopping-cart"></i><sup>0</sup>
+            </a>
+            <a href="../customer/profile.php"><i class="fas fa-user"></i></a>
         </div>
+
     </div>
 
 
