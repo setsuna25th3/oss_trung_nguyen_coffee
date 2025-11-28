@@ -16,6 +16,7 @@
     $productController = new ProductController();
     $products = $productController->getAllProducts($storeId, $categoryId);
     $featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
+    $latestProducts = $productController->getLatestProducts($storeId, $limits);
 
 ?>
 <!DOCTYPE html>
@@ -512,16 +513,29 @@
 
             <div class="sidebar-section">
                 <h3>Sản phẩm mới</h3>
-                <!-- Lọc dựa trên thời gian thêm -->
-
-                <!-- <div class="featured-product">
-                    <img src="Images/SanPham/sample.jpg" alt="Sản phẩm mới">
-                    <div>
-                        <h4>Nước đá cam</h4>
-                        <p>25.000 VND</p>
-                    </div>
-                </div> -->
-                <!-- Thêm nhiều hơn nếu cần -->
+                <?php if (!empty($latestProducts)): ?>
+                    <?php foreach ($latestProducts as $product): ?>
+                        <?php
+                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                        ?>
+                        <div class="featured-product">
+                            <?php if (!empty($p_Img)): ?>
+                                <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                            <?php else: ?>
+                                <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
+                            <?php endif; ?>
+                            <div>
+                                <h4><?php echo htmlspecialchars($p_Title); ?></h4>
+                                <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p style="color: #999;">Không có sản phẩm nổi bật</p>
+                <?php endif; ?>
             </div>
 
             <div class="sidebar-section">

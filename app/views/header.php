@@ -229,7 +229,7 @@
 
     <div class="menu">
         <div class="logo">
-            <img src="/oss_trung_nguyen_coffee/images/Images/Logo/logo.png" alt="Trung Nguyên Legend">
+            <img src="../../img/Logo/logo.jpg" alt="Trung Nguyên Legend">
         </div>
         <div class="menu-nav">
             <a href="../home/index.php">Trang chủ</a>

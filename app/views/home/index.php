@@ -140,19 +140,19 @@
     </section>
 
     <!-- SLIDER -->
-    <!-- <div class="banner-slider">
+    <div class="banner-slider">
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
 
         <div class="slider-container">
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh1.jpg"></div>
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh2.jpg"></div>
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh3.jpg"></div>
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh4.jpg"></div>
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh5.jpg"></div>
-            <div class="slide"><img src="/oss_trung_nguyen_coffee/images/Images/ChiNhanh/chinhanh6.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh1.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh2.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh3.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh4.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh5.jpg"></div>
+            <div class="slide"><img src="../../img/ChiNhanh/chinhanh6.jpg"></div>
         </div>
-    </div> -->
+    </div>
 
     <script>
         let index = 0;
