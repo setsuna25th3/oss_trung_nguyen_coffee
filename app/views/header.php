@@ -223,7 +223,7 @@
             <span><i class="fas fa-envelope"></i> contact@trungnguyencoffee.com</span>
         </div>
         <div class="right">
-            <a href="../customer/login.php">Đăng nhập</a> / <a href="../customer/signup.php">Đăng ký</a>
+            <a href="../customer/sign_in.php">Đăng nhập</a> / <a href="../customer/sign_up.php">Đăng ký</a>
         </div>
     </div>
 

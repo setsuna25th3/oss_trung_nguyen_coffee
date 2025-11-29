@@ -1,7 +1,7 @@
 <?php
     if (!class_exists('CustomerController')) {
         require_once __DIR__ .'/../env.php';
-        require_once __DIR__ .'/../models/CustomerItem.php';
+        require_once __DIR__ .'/../models/Customer.php';
 
         class CustomerController {
             public function getCustomerByEmail($email){
@@ -65,14 +65,76 @@
                 return $customer;
             }
 
+            public function checkDuplicateByEmail($customer){
+                global $hostname, $username, $password, $dbname, $port;
+                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $sql = "SELECT * FROM customer WHERE Phone = ?" . $customer->Email;
+                $result = $db->query($sql);
+                return $result->num_rows;
+            }
+
+            public function checkDuplicateByPhone($customer){
+                global $hostname, $username, $password, $dbname, $port;
+                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $sql = "SELECT * FROM customer WHERE Phone = ?" . $customer->Phone;
+                $result = $db->query($sql);
+                return $result->num_rows;
+            }
+
             public function SignUp($customer) {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $sql = "INSERT INTO customer (FirstName, LastName, Address, Phone, Email, Img, RegisteredAt, DateOfBirth, Password, RandomKey, IsActive, Role)
+                        VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, 0)";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("ssssssdssi", 
+                    $customer->FirstName,
+                    $customer->LastName,
+                    $customer->Address,
+                    $customer->Phone,
+                    $customer->Email,
+                    $customer->Img,
+                    $customer->DateOfBirth,
+                    $customer->Password,
+                    $customer->RandomKey,
+                    $customer->IsActive
+                );
+                $result = $stmt->execute();
+                return $result && ($stmt->affected_rows > 0);
             }
 
             public function UpdateCustomer($customer) {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $sql = "UPDATE customer SET 
+                            FirstName = ?,
+                            LastName = ?,
+                            Address = ?,
+                            Phone = ?,
+                            Email = ?,
+                            Img = ?,
+                            UpdateAt = NOW(),
+                            DateOfBirth = ?,
+                            Password = ?,
+                            RandomKey = ?,
+                            IsActive = ?,
+                        WHERE Id = ?";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("ssssssssssi",
+                    $customer->FirstName,
+                    $customer->LastName,
+                    $customer->Address,
+                    $customer->Phone,
+                    $customer->Email,
+                    $customer->Img,
+                    $customer->DateOfBirth,
+                    $customer->Password,
+                    $customer->RandomKey,
+                    $customer->IsActive,
+                    $customer->Id
+                );
+                $result = $stmt->execute();
+                return $result && ($stmt->affected_rows > 0);
             }
         }
     }
