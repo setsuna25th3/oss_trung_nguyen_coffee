@@ -13,6 +13,7 @@ return [
     'from_email' => getenv('MAIL_FROM_ADDRESS') ?: 'trungnguyen.coffee@gmail.com',
     'from_name' => getenv('MAIL_FROM_NAME') ?: 'Trung Nguyen Coffee Support',
     'base_reset_url' => getenv('RESET_PASSWORD_BASE_URL')
+
         ?: 'http://localhost/oss_trung_nguyen_coffee_nhat_thanh/views/customer/resetpassword.php',
 ];
 

@@ -104,6 +104,8 @@ if (!empty($errors)) {
     
     // Chuyển hướng đến URL mục tiêu
     header('Location: ' . $returnUrl);
+    header('Location: ../home/index.php ' . $returnUrl);
+
     exit();
 }
 // KHÔNG CÓ THẺ ĐÓNG ?>

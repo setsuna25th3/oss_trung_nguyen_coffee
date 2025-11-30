@@ -1,6 +1,11 @@
+
 <?php include '../header.php';?>
 <!DOCTYPE html>
 <html lang="vi">
+
+<!DOCTYPE html>
+<html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -401,6 +406,10 @@
 
 <body>
     
+
+    <?php include '../header.php'; ?>
+
+
     <div class="container-fluid page-header">
         <h1 class="display-6 fw-bold font-monospace">Trung Nguyên Cà Phê</h1>
         <ul class="breadcrumb">

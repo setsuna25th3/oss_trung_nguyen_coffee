@@ -6,7 +6,6 @@ require_once '../../db_connect.php';
 $base_url = '/oss_trung_nguyen_coffee_nhat_thanh'; 
 $image_base = $base_url . '/images/ChiNhanh';
 ?>
-
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -23,9 +22,11 @@ $image_base = $base_url . '/images/ChiNhanh';
             padding-top: 150px;
             /* tránh bị header che */
             font-family: 'Segoe UI', sans-serif;
+
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+
         }
 
         /* HERO */
@@ -56,6 +57,7 @@ $image_base = $base_url . '/images/ChiNhanh';
             font-size: 16px;
             color: #444;
             line-height: 1.6;
+            line-height: 1.8;
         }
 
         /* SLIDER */
@@ -66,16 +68,24 @@ $image_base = $base_url . '/images/ChiNhanh';
             overflow: hidden;
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            height: 600px;
+            margin: 40px auto 100px;
+            overflow: hidden;
+            border-radius: 18px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
         }
 
         .slider-container {
             display: flex;
+            height: 100%;
             transition: transform 0.5s ease-in-out;
         }
 
         .slide {
             min-width: 100%;
             box-sizing: border-box;
+            height: 100%;
         }
 
         .slide img {
@@ -83,6 +93,8 @@ $image_base = $base_url . '/images/ChiNhanh';
             height: 500px; /* Chiều cao cố định cho ảnh */
             object-fit: cover; /* Đảm bảo ảnh cover toàn bộ khu vực */
             display: block;
+            height: 100%;
+            object-fit: cover;
         }
 
         .prev,
@@ -99,6 +111,11 @@ $image_base = $base_url . '/images/ChiNhanh';
             font-size: 20px;
             border-radius: 50%;
             transition: background 0.3s;
+            font-size: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 20;
         }
 
         .prev:hover,
@@ -113,10 +130,28 @@ $image_base = $base_url . '/images/ChiNhanh';
         .next {
             right: 20px;
         }
+
+
+
+        @media (max-width: 768px) {
+            .banner-slider {
+                height: 300px;
+            }
+
+            .hero h1 {
+                font-size: 42px;
+            }
+
+            .hero h2 {
+                font-size: 20px;
+            }
+        }
+
     </style>
 </head>
 
 <body>
+
     <?php include '../header.php'; ?>
 
     <section class="hero">
@@ -124,6 +159,24 @@ $image_base = $base_url . '/images/ChiNhanh';
         <h2>KIẾN TẠO THƯƠNG HIỆU CÀ PHÊ QUỐC GIA</h2>
         <p>
             Hệ thống cửa hàng cà phê Trung Nguyên trải dài trên khắp đất nước và vươn ra quốc tế, mang đến trải nghiệm cà phê chuẩn mực
+
+    <!-- HEADER -->
+    <?php
+    require_once '../../db_connect.php';
+    include "../header.php";
+     ?>
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1>TRUNG NGUYÊN CÀ PHÊ</h1>
+        <h2>CÀ PHÊ NĂNG LƯỢNG – CÀ PHÊ ĐỔI ĐỜI</h2>
+
+        <p>
+            Trung Nguyên Cà Phê là thương hiệu cà phê hàng đầu Việt Nam, nổi tiếng với sứ mệnh lan tỏa
+            văn hóa thưởng thức cà phê Việt đến toàn cầu. Được thành lập vào năm 1996, Trung Nguyên
+            cung cấp sản phẩm chất lượng cao với hương vị đậm đà đặc trưng.
+            <br><br>
+            Chuỗi hệ thống có hơn 1.000 cửa hàng trên toàn quốc, mang đến trải nghiệm cà phê chuẩn mực
             dành cho mọi khách hàng yêu thích văn hóa cà phê Việt.
         </p>
     </section>
@@ -141,6 +194,12 @@ $image_base = $base_url . '/images/ChiNhanh';
             <div class="slide"><img src="<?= $image_base ?>/chinhanh4.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh5.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh6.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh1.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh2.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh3.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh4.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh5.jpg"></div>
+            <div class="slide"><img src="../../images/ChiNhanh/chinhanh6.jpg"></div>
         </div>
     </div>
 
@@ -162,6 +221,14 @@ $image_base = $base_url . '/images/ChiNhanh';
     </script>
 
     <?php include '../footer.php'; ?>
+
+        setInterval(() => showSlide(index + 1), 5000);
+    </script>
+
+    <!-- FOOTER -->
+    <?php include "../footer.php"; ?>
+
+
 </body>
 
 </html>

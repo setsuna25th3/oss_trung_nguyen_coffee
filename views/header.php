@@ -1,3 +1,4 @@
+
 <?php
 ob_start();
 // Đảm bảo session_start() được gọi (thường đã có trong db_connect.php)
@@ -12,6 +13,7 @@ $profileLink = '../customer/profile.php';
 // Đảm bảo đường dẫn đến sign_out.php là đúng
 $logoutLink = '../customer/sign_out.php';    
 ?>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     * {
@@ -266,6 +268,12 @@ $logoutLink = '../customer/sign_out.php';
             ?>
                 <a href="<?= $profileLink ?>" class="welcome-link">Xin chào, **<?= $fullName ?>**</a>
                 <a href="<?= $logoutLink = '../customer/sign_out.php'; ?>">Đăng xuất</a>
+
+                $logoutLink = '../customer/sign_out.php';    
+            ?>
+                <a href="<?= $profileLink ?>" class="welcome-link">Xin chào, **<?= $fullName ?>**</a>
+                <a href="<?= $logoutLink ?>">Đăng xuất</a>
+
             <?php else: ?>
                 <a href="../customer/login.php">Đăng nhập</a> / <a href="../customer/signup.php">Đăng ký</a>
             <?php endif; ?>
