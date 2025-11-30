@@ -51,7 +51,7 @@
                 return $products;
             }
 
-            public function getProductById(int $storeId, int $categoryId, int $productId)
+            public function getProductById(int $productId)
             {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
@@ -63,12 +63,6 @@
                         JOIN storeproduct sp on p.Id = sp.ProductId
                         JOIN store s on sp.StoreId = s.Id
                         WHERE p.Id = " . intval($productId);
-                if ($categoryId > 0) {
-                    $sql .= " WHERE c.Id = " . intval($categoryId);
-                }
-                if ($storeId > 0) {
-                    $sql .= ($categoryId > 0 ? " AND " : " WHERE ") . " s.Id = " . intval($storeId) . " and sp.IsAvailable = 1";
-                }
                 $result = $db->query($sql);
 
                 $product = new Product();

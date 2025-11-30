@@ -1,11 +1,6 @@
 <?php
     session_start();
 
-    $signUpErrorMessage = $_SESSION['SignUpErrorMessage'] ?? '';
-    unset($_SESSION['SignUpErrorMessage']);
-?>
-<?php include '../header.php'?>
-<?php
     include '../../models/Customer.php';
     include '../../controllers/CustomerController.php';
 
@@ -13,9 +8,40 @@
     $firstName = $_POST['FirstName'] ?? ' ';
     $email = $_POST['Email'] ?? ' ';
     $phone = $_POST['Phone'] ?? ' ';
+    
+    $UPLOAD_DIR = '../../img/KhachHang/';
 
     function printVar($var){
         if (isset($var)) echo $var;
+    }
+
+    function uploadImage($uploadDir, $identifier){
+        if (!isset($_FILES['ImgUpload']) || $_FILES['ImgUpload']['error'] !== UPLOAD_ERR_OK) {
+            return 'img/KhachHang/avatar-default.jpg';
+        }
+
+        $file = $_FILES['ImgUpload'];
+        $temp_path = $file['tmp_name'];
+        $file_extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $folder_name = md5(trim($identifier));
+        $target_folder = $uploadDir . $folder_name . '/';
+
+        if (!is_dir($target_folder)) {
+            if (mkdir($target_folder, 0755, true)){
+                error_log('Failed to create directory: ' . $target_folder);
+                return false;
+            }
+        }
+
+        $file_name = 'avatar_' . time() . '.' . $file_extension;
+        $target_file = $target_folder . $file_name;
+
+        if (move_uploaded_file($temp_path, $target_file)) {
+            return 'img/KhachHang/' . $folder_name . '/' . $file_name;
+        } else {
+            error_log('Failed to move uploaded file to: ' . $target_file);
+            return false;
+        }
     }
 
     if (isset($_POST['SignUp'])){
@@ -24,31 +50,50 @@
 
         $customer->LastName = $lastName;
         $customer->FirstName = $firstName;
-        $customer->Email = $email;
-        $customer->Phone = $phone;
-        $customer->Img = $_POST['ImgUpload'];
+        $customer->Email = trim($email);
+        $customer->Phone = trim($phone);
         $customer->Address = '';
         $customer->DateOfBirth = null;
         $customer->IsActive = 1;
         $customer->Password = password_hash($_POST['Password'], PASSWORD_DEFAULT);
         $customer->RandomKey = '';
-        $isSuccess = $customerController->SignUp($customer);
-        if ($customerController->checkDuplicateByEmail($customer)){
-            $_SESSION['SignUpErrorMessage'] = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
+        $email_exists = $customerController->checkDuplicateByEmail($customer);
+        $phone_exists = $customerController->checkDuplicateByPhone($customer);
+
+        $tempErrorMessage = '';
+        if ($email_exists or $phone_exists){
+            if ($email_exists){
+                $tempErrorMessage = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
+            }
+            if ($phone_exists){
+                $tempErrorMessage = 'Số điện thoại đã tồn tại. Vui lòng sử dụng số điện thoại khác.';
+            }
+            if (!empty($tempErrorMessage)){
+                $_SESSION['SignUpErrorMessage'] = trim($tempErrorMessage);
+            }
         }
-        if ($customerController->checkDuplicateByPhone($customer)){
-            $_SESSION['SignUpErrorMessage'] = 'Số điện thoại đã tồn tại. Vui lòng sử dụng số điện thoại khác.';
+        else{
+            $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
+            if ($img_path === false){
+                $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại do lỗi tải ảnh. Vui lòng thử lại.';
+            }
+            else{
+                $customer->Img = $img_path;
+                $isSuccess = $customerController->signUp($customer);
+                if ($isSuccess) {
+                    $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
+                    header('Location: sign_in.php');
+                    exit();
+                } else {
+                    $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
+                }
+            }
         }
-        if ($isSuccess) {
-            $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
-            header('Location: sign_in.php');
-            exit();
-        } else {
-            $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
-            header('Location: sign_up.php');
-        }
+        $signUpErrorMessage = $_SESSION['SignUpErrorMessage'] ?? '';
+        unset($_SESSION['SignUpErrorMessage']);
     }
 ?>
+<?php include '../header.php'; ?>
 
 <style>
     body {
@@ -241,7 +286,7 @@
             </div>
         <?php endif; ?>
 
-        <form method="post" action="" enctype="multipart/form-data">
+        <form method="post" action="sign_up.php" enctype="multipart/form-data">
             <div class="text-center mb-3">
                 <img src="../img/avatar-default.jpg" id="image_preview">
                 <div>

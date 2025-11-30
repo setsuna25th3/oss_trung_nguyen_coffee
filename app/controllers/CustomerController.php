@@ -6,9 +6,9 @@
         class CustomerController {
             public function getCustomerByEmail($email){
                 global $hostname, $username, $password, $dbname, $port;
-                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $db = new mysqli($hostname, $username, '', $dbname, $port);
 
-                $sql = "SELECT * FROM customer WHERE Email = " . $email;
+                $sql = "SELECT * FROM customer WHERE Email = '" . $email . "'";
 
                 $result = $db->query($sql);
 
@@ -35,11 +35,11 @@
                 return $customer;
             }
 
-            public function getCustomerById(int $id){
+            public function getCustomerById($id){
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
 
-                $sql = "SELECT * FROM customer WHERE Id = " . $id;
+                $sql = "SELECT * FROM customer WHERE Id = " . (int)$id;
                 $result = $db->query($sql);
 
                 $customer = new Customer();
@@ -68,7 +68,7 @@
             public function checkDuplicateByEmail($customer){
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "SELECT * FROM customer WHERE Phone = ?" . $customer->Email;
+                $sql = "SELECT * FROM customer WHERE Email = '" . $customer->Email . "'";
                 $result = $db->query($sql);
                 return $result->num_rows;
             }
@@ -76,12 +76,12 @@
             public function checkDuplicateByPhone($customer){
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "SELECT * FROM customer WHERE Phone = ?" . $customer->Phone;
+                $sql = "SELECT * FROM customer WHERE Phone = '" . $customer->Phone . "'";
                 $result = $db->query($sql);
                 return $result->num_rows;
             }
 
-            public function SignUp($customer) {
+            public function signUp($customer) {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
                 $sql = "INSERT INTO customer (FirstName, LastName, Address, Phone, Email, Img, RegisteredAt, DateOfBirth, Password, RandomKey, IsActive, Role)
@@ -103,7 +103,7 @@
                 return $result && ($stmt->affected_rows > 0);
             }
 
-            public function UpdateCustomer($customer) {
+            public function updateCustomer($customer) {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
                 $sql = "UPDATE customer SET 

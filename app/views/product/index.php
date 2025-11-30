@@ -1,4 +1,5 @@
 <?php
+    session_start();
     require_once '../../controllers/ProductController.php';
     require_once '../../controllers/CategoryController.php';
     require_once '../../controllers/StoreController.php';
@@ -17,6 +18,8 @@
     $products = $productController->getAllProducts($storeId, $categoryId);
     $featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
     $latestProducts = $productController->getLatestProducts($storeId, $limits);
+
+    $customerId = $_SESSION['CustomerId'] ?? 0;
 
 ?>
 <!DOCTYPE html>
@@ -495,11 +498,17 @@
                             $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
-                            <?php if (!empty($p_Img)): ?>
-                                <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                            <?php else: ?>
-                                <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                            <?php endif; ?>
+                            <a href="detail.php">
+                                <?php if (!empty($p_Img)): ?>
+                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                <?php else: ?>
+                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
+                                <?php endif; ?>
+                                <?php
+                                    $_SESSION['currentProductId'] = $p_Id;
+                                    $_SESSION['currertStoreId'] = $storeId;
+                                ?>
+                            </a>
                             <div>
                                 <h4><?php echo htmlspecialchars($p_Title); ?></h4>
                                 <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
@@ -522,11 +531,16 @@
                             $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
-                            <?php if (!empty($p_Img)): ?>
-                                <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                            <?php else: ?>
-                                <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                            <?php endif; ?>
+                            <a href="detail.php">
+                                <?php if (!empty($p_Img)): ?>
+                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                <?php else: ?>
+                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
+                                <?php endif; ?>
+                                <?php
+                                    $_SESSION['currentProductId'] = $p_Id;
+                                ?>
+                            </a>
                             <div>
                                 <h4><?php echo htmlspecialchars($p_Title); ?></h4>
                                 <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
@@ -582,11 +596,16 @@
                             $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
                         ?>
                         <div class="card">
-                            <?php if (!empty($p_Img)): ?>
-                                <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                            <?php else: ?>
-                                <img src="Images/SanPham/sample.jpg" alt="Sản phẩm">
-                            <?php endif; ?>
+                            <a href="detail.php">
+                                <?php if (!empty($p_Img)): ?>
+                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                <?php else: ?>
+                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
+                                <?php endif; ?>
+                                <?php
+                                    $_SESSION['currentProductId'] = $p_Id;
+                                ?>
+                            </a>
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($p_Title); ?></h5>
                                 <p class="card-text"><?php echo htmlspecialchars(substr($p_Content, 0, 100)); ?></p>

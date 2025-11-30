@@ -1,3 +1,9 @@
+<?php
+    session_start();
+
+    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
+    $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
+?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
     * {
@@ -222,9 +228,16 @@
             <span><i class="fas fa-map-marker-alt"></i> Trung Nguyên Coffee</span>
             <span><i class="fas fa-envelope"></i> contact@trungnguyencoffee.com</span>
         </div>
-        <div class="right">
-            <a href="../customer/sign_in.php">Đăng nhập</a> / <a href="../customer/sign_up.php">Đăng ký</a>
-        </div>
+        <?php if ($customerId): ?>
+            <div class="right">
+                <a href="../customer/profile.php">Xin chào, <?php echo htmlspecialchars($customerName); ?></a>
+                <a href="../customer/log_out.php">Đăng xuất</a>
+            </div>
+        <?php else: ?>
+            <div class="right">
+                <a href="../customer/sign_in.php">Đăng nhập</a> / <a href="../customer/sign_up.php">Đăng ký</a>
+            </div>
+        <?php endif; ?>
     </div>
 
     <div class="menu">
