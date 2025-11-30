@@ -1,29 +1,30 @@
-
 <?php
 ob_start();
-// Đảm bảo session_start() được gọi (thường đã có trong db_connect.php)
-if (session_status() == PHP_SESSION_NONE) {
+
+// BẮT BUỘC: Đảm bảo session_start() được gọi TRƯỚC KHI thao tác với $_SESSION
+if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 // Lấy thông tin người dùng từ session
 $isLoggedIn = isset($_SESSION['customer_id']);
 // Lấy Tên đầy đủ được lưu trong sign_in_process.php
 $fullName = $_SESSION['customer_fullname'] ?? 'Khách hàng'; 
+// Đường dẫn cần được tính toán lại tùy thuộc vào nơi header.php được include
+// Vì header.php nằm trong thư mục views, đường dẫn tới customer/sign_out.php là ../customer/sign_out.php
 $profileLink = '../customer/profile.php';
-// Đảm bảo đường dẫn đến sign_out.php là đúng
-$logoutLink = '../customer/sign_out.php';    
+$logoutLink = '../customer/sign_out.php';
 ?>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-    * {
+    /* KHÔNG CẦN RESET CSS Ở ĐÂY, TRÁNH LỖI OVERWRITE */
+    /* * {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
-    }
+    } */
 
     body {
-        
         padding-top: 160px; 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
@@ -62,7 +63,6 @@ $logoutLink = '../customer/sign_out.php';
         background-color: #455a64;
         border-radius: 25px;
         font-weight: 500;
-        /* Thêm margin để tách biệt các nút (Xin chào/Đăng xuất) */
         margin-left: 8px; 
     }
 
@@ -73,10 +73,11 @@ $logoutLink = '../customer/sign_out.php';
     /* Thiết lập cho liên kết "Xin chào" không có background */
     .top-bar .right a.welcome-link {
         background-color: transparent;
-        padding: 5px 0; /* Giảm padding để trông giống chữ hơn */
+        padding: 5px 0; 
         border-radius: 0;
         font-weight: 600;
         text-decoration: none;
+        margin-right: 0; /* Đảm bảo không có margin không cần thiết */
     }
     .top-bar .right a.welcome-link:hover {
         background-color: transparent;
@@ -262,14 +263,7 @@ $logoutLink = '../customer/sign_out.php';
             if (isset($_SESSION['customer_id'])): 
                 // Lấy tên đầy đủ của khách hàng (đã lưu trong sign_in_process.php)
                 $fullName = htmlspecialchars($_SESSION['customer_fullname'] ?? 'Khách hàng');
-                // Đường dẫn tương đối từ 'views' (thư mục chứa header.php)
-                $profileLink = '../customer/profile.php'; 
-                $logoutLink = '../../customer/sign_out.php';    
-            ?>
-                <a href="<?= $profileLink ?>" class="welcome-link">Xin chào, **<?= $fullName ?>**</a>
-                <a href="<?= $logoutLink = '../customer/sign_out.php'; ?>">Đăng xuất</a>
-
-                $logoutLink = '../customer/sign_out.php';    
+                // Các đường dẫn đã được định nghĩa ở trên: $profileLink và $logoutLink
             ?>
                 <a href="<?= $profileLink ?>" class="welcome-link">Xin chào, **<?= $fullName ?>**</a>
                 <a href="<?= $logoutLink ?>">Đăng xuất</a>
@@ -305,7 +299,7 @@ $logoutLink = '../customer/sign_out.php';
             </a>
             
             <?php if (isset($_SESSION['customer_id'])): ?>
-                <a href="../customer/profile.php"><i class="fas fa-user"></i></a>
+                <a href="<?= $profileLink ?>"><i class="fas fa-user"></i></a>
             <?php else: ?>
                 <a href="../customer/login.php"><i class="fas fa-user"></i></a>
             <?php endif; ?>

@@ -3,6 +3,7 @@
 require_once '../../db_connect.php'; 
 
 // ĐỊNH NGHĨA BASE URL (QUAN TRỌNG: CẦN ĐIỀU CHỈNH NẾU THƯ MỤC GỐC KHÁC)
+// Lưu ý: Đã loại bỏ include header ở đây, đưa xuống dưới thẻ <body>
 $base_url = '/oss_trung_nguyen_coffee_nhat_thanh'; 
 $image_base = $base_url . '/images/ChiNhanh';
 ?>
@@ -19,14 +20,11 @@ $image_base = $base_url . '/images/ChiNhanh';
     <style>
         body {
             background-color: #fff1e0;
-            padding-top: 150px;
-            /* tránh bị header che */
+            padding-top: 150px; /* tránh bị header che */
             font-family: 'Segoe UI', sans-serif;
-
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-
         }
 
         /* HERO */
@@ -56,23 +54,17 @@ $image_base = $base_url . '/images/ChiNhanh';
             margin: 0 auto;
             font-size: 16px;
             color: #444;
-            line-height: 1.6;
             line-height: 1.8;
         }
 
         /* SLIDER */
         .banner-slider {
             max-width: 1200px;
-            margin: 50px auto;
-            position: relative;
-            overflow: hidden;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            height: 600px;
+            height: 600px; 
             margin: 40px auto 100px;
             overflow: hidden;
-            border-radius: 18px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            border-radius: 18px; 
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); 
             position: relative;
         }
 
@@ -90,11 +82,9 @@ $image_base = $base_url . '/images/ChiNhanh';
 
         .slide img {
             width: 100%;
-            height: 500px; /* Chiều cao cố định cho ảnh */
-            object-fit: cover; /* Đảm bảo ảnh cover toàn bộ khu vực */
-            display: block;
-            height: 100%;
+            height: 100%; 
             object-fit: cover;
+            display: block;
         }
 
         .prev,
@@ -107,15 +97,10 @@ $image_base = $base_url . '/images/ChiNhanh';
             border: none;
             padding: 15px;
             cursor: pointer;
-            z-index: 10;
-            font-size: 20px;
-            border-radius: 50%;
-            transition: background 0.3s;
+            z-index: 20;
             font-size: 24px;
             border-radius: 50%;
-            cursor: pointer;
             transition: 0.3s;
-            z-index: 20;
         }
 
         .prev:hover,
@@ -131,8 +116,6 @@ $image_base = $base_url . '/images/ChiNhanh';
             right: 20px;
         }
 
-
-
         @media (max-width: 768px) {
             .banner-slider {
                 height: 300px;
@@ -146,27 +129,16 @@ $image_base = $base_url . '/images/ChiNhanh';
                 font-size: 20px;
             }
         }
-
     </style>
 </head>
 
 <body>
 
-    <?php include '../header.php'; ?>
+    <?php 
+    // Header chỉ được include MỘT LẦN
+    include '../header.php'; 
+    ?>
 
-    <section class="hero">
-        <h1>TRUNG NGUYÊN LEGEND</h1>
-        <h2>KIẾN TẠO THƯƠNG HIỆU CÀ PHÊ QUỐC GIA</h2>
-        <p>
-            Hệ thống cửa hàng cà phê Trung Nguyên trải dài trên khắp đất nước và vươn ra quốc tế, mang đến trải nghiệm cà phê chuẩn mực
-
-    <!-- HEADER -->
-    <?php
-    require_once '../../db_connect.php';
-    include "../header.php";
-     ?>
-
-    <!-- HERO -->
     <section class="hero">
         <h1>TRUNG NGUYÊN CÀ PHÊ</h1>
         <h2>CÀ PHÊ NĂNG LƯỢNG – CÀ PHÊ ĐỔI ĐỜI</h2>
@@ -181,25 +153,17 @@ $image_base = $base_url . '/images/ChiNhanh';
         </p>
     </section>
 
-    <!-- SLIDER -->
     <div class="banner-slider">
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
 
         <div class="slider-container">
-            <!-- SỬ DỤNG $image_base CHO ĐƯỜNG DẪN TUYỆT ĐỐI -->
             <div class="slide"><img src="<?= $image_base ?>/chinhanh1.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh2.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh3.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh4.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh5.jpg"></div>
             <div class="slide"><img src="<?= $image_base ?>/chinhanh6.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh1.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh2.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh3.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh4.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh5.jpg"></div>
-            <div class="slide"><img src="../../images/ChiNhanh/chinhanh6.jpg"></div>
         </div>
     </div>
 
@@ -217,18 +181,11 @@ $image_base = $base_url . '/images/ChiNhanh';
         document.querySelector('.next').onclick = () => showSlide(index + 1);
 
         // Auto slide
-        setInterval(() => showSlide(index + 1), 5000);
+        // Chỉ chạy MỘT LẦN duy nhất
+        setInterval(() => showSlide(index + 1), 5000); 
     </script>
 
     <?php include '../footer.php'; ?>
-
-        setInterval(() => showSlide(index + 1), 5000);
-    </script>
-
-    <!-- FOOTER -->
-    <?php include "../footer.php"; ?>
-
-
 </body>
 
 </html>

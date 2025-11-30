@@ -1,26 +1,32 @@
 <?php
 
-// Bắt đầu Output Buffering để tránh lỗi Header đã được gửi.
 // DÒNG NÀY PHẢI Ở ĐẦU TIÊN
+// Bắt đầu Output Buffering để tránh lỗi Header đã được gửi.
 ob_start(); 
+
+// BẮT BUỘC: Khởi động session nếu chưa có để thao tác với $_SESSION/session_destroy()
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 require_once '../../db_connect.php'; 
 require_once '../../models/Customer.php';
 
 // Giả định hàm set_flash_message đã được định nghĩa ở đâu đó
-// và SESSION đã được khởi tạo (session_start()) trước khi chạy ob_start()
 
-global $conn;
+// Kéo biến $conn về phạm vi cục bộ (dù đã là global trong db_connect nhưng nên khai báo)
+global $conn; 
 
 // --- 1. Xóa Cookie Remember Me và Cập nhật DB ---
 if (isset($_COOKIE['remember_user']) || isset($_COOKIE['remember_key'])) {
-    $userId = $_COOKIE['remember_user'] ?? null;
+    // Lấy userId một cách an toàn
+    $userId = $_COOKIE['remember_user'] ?? null; 
     
     // Nếu có ID người dùng từ cookie, cập nhật RandomKey = NULL trong CSDL
     if (!empty($userId) && is_numeric($userId)) {
-        // Sử dụng $conn từ db_connect.php
+        
         $updateStmt = $conn->prepare("UPDATE customer SET RandomKey = NULL WHERE Id = ?");
-        // Giả định $updateStmt thành công, nếu không sẽ báo lỗi
+        
         if ($updateStmt) { 
              $updateStmt->bind_param("i", $userId);
              $updateStmt->execute();
@@ -39,18 +45,20 @@ $_SESSION = array(); // Xóa tất cả dữ liệu session
 // Xóa cookie session (nếu đang dùng)
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
+    // Đặt thời gian hết hạn trong quá khứ
     setcookie(session_name(), '', time() - 42000,
         $params["path"], $params["domain"],
         $params["secure"], $params["httponly"]
     );
 }
 
-session_destroy(); // Hủy session
+session_destroy(); // Hủy session hoàn toàn
 
 // --- 3. Chuyển hướng ---
-set_flash_message("Bạn đã đăng xuất thành công.", "success");
+// Đảm bảo hàm set_flash_message đã được định nghĩa và có thể truy cập được
+set_flash_message("Bạn đã đăng xuất thành công.", "success"); 
 header('Location: ../home/index.php'); 
-ob_end_flush(); // Kết thúc và gửi output buffer
-exit(); // Dừng thực thi script ngay lập tức
+ob_end_flush(); 
+exit(); 
 
 ?>
