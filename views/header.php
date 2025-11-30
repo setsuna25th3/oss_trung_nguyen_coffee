@@ -1,9 +1,7 @@
 <?php
-ob_start();
 
-// BẮT BUỘC: Đảm bảo session_start() được gọi TRƯỚC KHI thao tác với $_SESSION
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+session_start();
 }
 // Lấy thông tin người dùng từ session
 $isLoggedIn = isset($_SESSION['customer_id']);
