@@ -1,10 +1,11 @@
 <?php
-    namespace App\Models;
-    
     class CartItem {
-        public $CartId;
-        public $Product;
+        public $Id;
+        public $CustomerId;
+        public $ProductId;
+        public $StoreId;
         public $Quantity;
-        public $Price;
+        public $CreatedAt;
+        public $isSelected;
     }
 ?>

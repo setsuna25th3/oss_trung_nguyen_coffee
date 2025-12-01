@@ -30,7 +30,6 @@
                     $customer->IsActive = $row['IsActive'];
                     $customer->Role = $row['Role'];
                 }
-
                 $db->close();
                 return $customer;
             }
@@ -60,7 +59,6 @@
                     $customer->IsActive = $row['IsActive'];
                     $customer->Role = $row['Role'];
                 }
-
                 $db->close();
                 return $customer;
             }
@@ -69,14 +67,6 @@
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
                 $sql = "SELECT * FROM customer WHERE Email = '" . $customer->Email . "'";
-                $result = $db->query($sql);
-                return $result->num_rows;
-            }
-
-            public function checkDuplicateByPhone($customer){
-                global $hostname, $username, $password, $dbname, $port;
-                $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "SELECT * FROM customer WHERE Phone = '" . $customer->Phone . "'";
                 $result = $db->query($sql);
                 return $result->num_rows;
             }
@@ -111,26 +101,34 @@
                             LastName = ?,
                             Address = ?,
                             Phone = ?,
-                            Email = ?,
                             Img = ?,
                             UpdateAt = NOW(),
-                            DateOfBirth = ?,
-                            Password = ?,
-                            RandomKey = ?,
-                            IsActive = ?,
+                            DateOfBirth = ?
                         WHERE Id = ?";
                 $stmt = $db->prepare($sql);
-                $stmt->bind_param("ssssssssssi",
+                $stmt->bind_param("sssssdi",
                     $customer->FirstName,
                     $customer->LastName,
                     $customer->Address,
                     $customer->Phone,
-                    $customer->Email,
                     $customer->Img,
                     $customer->DateOfBirth,
+                    $customer->Id
+                );
+                $result = $stmt->execute();
+                return $result && ($stmt->affected_rows > 0);
+            }
+
+            public function changePassword($customer) {
+                global $hostname, $username, $password, $dbname, $port;
+                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                $sql = "UPDATE customer SET 
+                            Password = ?,
+                            UpdateAt = NOW()
+                        WHERE Id = ?";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("si",
                     $customer->Password,
-                    $customer->RandomKey,
-                    $customer->IsActive,
                     $customer->Id
                 );
                 $result = $stmt->execute();

@@ -1,6 +1,5 @@
 <?php
     session_start();
-
     include '../../models/Customer.php';
     include '../../controllers/CustomerController.php';
 
@@ -17,7 +16,7 @@
 
     function uploadImage($uploadDir, $identifier){
         if (!isset($_FILES['ImgUpload']) || $_FILES['ImgUpload']['error'] !== UPLOAD_ERR_OK) {
-            return 'img/KhachHang/avatar-default.jpg';
+            return 'avatar-default.png';
         }
 
         $file = $_FILES['ImgUpload'];
@@ -27,7 +26,7 @@
         $target_folder = $uploadDir . $folder_name . '/';
 
         if (!is_dir($target_folder)) {
-            if (mkdir($target_folder, 0755, true)){
+            if (!mkdir($target_folder, 0755, true)){
                 error_log('Failed to create directory: ' . $target_folder);
                 return false;
             }
@@ -37,7 +36,7 @@
         $target_file = $target_folder . $file_name;
 
         if (move_uploaded_file($temp_path, $target_file)) {
-            return 'img/KhachHang/' . $folder_name . '/' . $file_name;
+            return $file_name;
         } else {
             error_log('Failed to move uploaded file to: ' . $target_file);
             return false;
@@ -58,19 +57,10 @@
         $customer->Password = password_hash($_POST['Password'], PASSWORD_DEFAULT);
         $customer->RandomKey = '';
         $email_exists = $customerController->checkDuplicateByEmail($customer);
-        $phone_exists = $customerController->checkDuplicateByPhone($customer);
 
         $tempErrorMessage = '';
-        if ($email_exists or $phone_exists){
-            if ($email_exists){
-                $tempErrorMessage = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
-            }
-            if ($phone_exists){
-                $tempErrorMessage = 'Số điện thoại đã tồn tại. Vui lòng sử dụng số điện thoại khác.';
-            }
-            if (!empty($tempErrorMessage)){
-                $_SESSION['SignUpErrorMessage'] = trim($tempErrorMessage);
-            }
+        if ($email_exists){
+            $_SESSION['SignUpErrorMessage'] = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
         }
         else{
             $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
@@ -93,6 +83,7 @@
         unset($_SESSION['SignUpErrorMessage']);
     }
 ?>
+
 <?php include '../header.php'; ?>
 
 <style>
@@ -281,7 +272,7 @@
 
         <?php if (!empty($signUpErrorMessage)): ?>
             <div class="alert alert-danger alert-dismissible fade show">
-                <strong>Error!</strong> <?= htmlspecialchars($signUpErrorMessage) ?>
+                <strong><?= htmlspecialchars($signUpErrorMessage) ?></strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
@@ -322,7 +313,7 @@
             </table>
 
             <div class="text-center mt-3">
-                Đã có tài khoản? <a href="../customer/login.php">Đăng nhập</a>
+                Đã có tài khoản? <a href="sign_in.php">Đăng nhập</a>
             </div>
 
             <div class="text-center mt-3">

@@ -3,6 +3,13 @@
     require_once '../../controllers/ProductController.php';
     require_once '../../controllers/CategoryController.php';
     require_once '../../controllers/StoreController.php';
+    require_once '../../controllers/CartController.php';
+
+    $successMessage = $_SESSION['success_message'] ?? '';
+    unset($_SESSION['success_message']);
+    
+    $errorMessage = $_SESSION['error_message'] ?? '';
+    unset($_SESSION['error_message']);
 
     $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
     $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
@@ -20,8 +27,8 @@
     $latestProducts = $productController->getLatestProducts($storeId, $limits);
 
     $customerId = $_SESSION['CustomerId'] ?? 0;
-
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -425,8 +432,8 @@
 </head>
 
 <body>
-    <?php require_once '../header.php'; ?>
-
+    <?php include '../header.php';?>
+    
     <div class="container-fluid page-header">
         <h1 class="display-6 fw-bold font-monospace">Trung Nguyên Cà Phê</h1>
         <ul class="breadcrumb">
@@ -441,6 +448,21 @@
     </div>
 
     <div class="branch-select-box">
+        <div class="container" style="display: block; max-width: 1200px; padding-top: 0; padding-bottom: 20px;">
+            <?php if (!empty($successMessage)): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <?= $successMessage ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($errorMessage)): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <?= $errorMessage ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+        </div>
         <label for="branchSelect">Chọn chi nhánh:</label>
         <form method="get" action="" id="branchForm">
             <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
@@ -498,16 +520,12 @@
                             $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
-                            <a href="detail.php">
+                            <a href="detail.php?id=<?php echo $p_Id; ?>">
                                 <?php if (!empty($p_Img)): ?>
                                     <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
                                 <?php else: ?>
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
                                 <?php endif; ?>
-                                <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
-                                    $_SESSION['currertStoreId'] = $storeId;
-                                ?>
                             </a>
                             <div>
                                 <h4><?php echo htmlspecialchars($p_Title); ?></h4>
@@ -531,15 +549,12 @@
                             $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
-                            <a href="detail.php">
+                            <a href="detail.php?id=<?php echo $p_Id; ?>">
                                 <?php if (!empty($p_Img)): ?>
                                     <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
                                 <?php else: ?>
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
                                 <?php endif; ?>
-                                <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
-                                ?>
                             </a>
                             <div>
                                 <h4><?php echo htmlspecialchars($p_Title); ?></h4>
@@ -596,21 +611,27 @@
                             $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
                         ?>
                         <div class="card">
-                            <a href="detail.php">
+                            <a href="detail.php?id=<?php echo $p_Id; ?>">
                                 <?php if (!empty($p_Img)): ?>
                                     <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
                                 <?php else: ?>
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
                                 <?php endif; ?>
-                                <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
-                                ?>
                             </a>
                             <div class="card-body">
                                 <h5 class="card-title"><?php echo htmlspecialchars($p_Title); ?></h5>
                                 <p class="card-text"><?php echo htmlspecialchars(substr($p_Content, 0, 100)); ?></p>
                                 <span class="price"><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</span>
-                                <button class="btn"><i class="fa fa-shopping-bag me-2"></i>Thêm vào giỏ</button>
+                                <form action="../cart/add_to_cart.php" method="POST">
+                                    <input type="hidden" name="action" value="add_to_cart">
+                                    <input type="hidden" name="product_id" value="<?php echo $p_Id; ?>">
+                                    <input type="hidden" name="store_id" value="<?php echo $storeId; ?>">
+                                    <input type="hidden" name="quantity" value="1"> 
+                                    <input type="hidden" name="current_url_params" value="<?php echo http_build_query($_GET); ?>">
+                                    <button type="submit" class="btn">
+                                        <i class="fa fa-shopping-bag me-2"></i>Thêm vào giỏ
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     <?php endforeach; ?>

@@ -1,6 +1,42 @@
 <?php
     session_start();
-    
+    include '../../controllers/CustomerController.php';
+
+    $success = $_SESSION['ProfileSuccessMessage'] ?? '';
+    $error   = $_SESSION['ProfileErrorMessage'] ?? '';
+    unset($_SESSION['ProfileSuccessMessage'], $_SESSION['ProfileErrorMessage']);
+
+    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
+    $customerController = new CustomerController();
+    $customer = $customerController->getCustomerById($customerId);    
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
+        $customer->Id = $customerId;
+        $customer->FirstName = trim($_POST['FirstName']);
+        $customer->LastName = trim($_POST['LastName']);
+        $customer->Phone = trim($_POST['Phone']);
+        $customer->DateOfBirth = $_POST['DateOfBirth'];
+        $customer->Address = trim($_POST['Address']);
+
+        if (isset($_FILES['ImgUpload']) && $_FILES['ImgUpload']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = __DIR__ . '/../../img/KhachHang/' . md5(trim($customer->Email)) . '/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+            $file_name = 'avatar_' . time() . '.' . pathinfo($_FILES['ImgUpload']['name'], PATHINFO_EXTENSION);
+            $uploadedFile = $uploadDir . $file_name;
+            if (move_uploaded_file($_FILES['ImgUpload']['tmp_name'], $uploadedFile)) {
+                $customer->Img = $file_name;
+            }
+        }
+
+        $updateResult = $customerController->updateCustomer($customer);
+        if ($updateResult) {
+            $_SESSION['ProfileSuccessMessage'] = 'Cập nhật thông tin cá nhân thành công.';
+        } else {
+            $_SESSION['ProfileErrorMessage'] = 'Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.';
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -196,9 +232,7 @@
 </head>
 
 <body>
-
-    <?php include '../header.php'; ?>
-
+    <?php include '../header.php';?>
     <!-- Header -->
     <div class="container-fluid page-header">
         <h1 class="display-4 fw-bold">Thông tin cá nhân</h1>
@@ -238,31 +272,39 @@
                         </button>
                     </div>
 
-                    <form method="post" action="update_profile_process.php" enctype="multipart/form-data" id="profileForm">
+                    <form method="post" action="profile.php" enctype="multipart/form-data" id="profileForm">
                         <div class="row g-5 align-items-start">
                             <!-- Avatar + Nút hành động -->
                             <div class="col-lg-5 text-center">
                                 <div class="avatar-wrapper">
-                                    <img src="../Images/KhachHang/<?= htmlspecialchars($customer['Img']) ?>"
-                                        alt="Avatar" class="avatar-img" id="image_preview">
-                                    <label class="avatar-overlay" title="Đổi ảnh đại diện">
-                                        <i class="fas fa-camera fa-lg"></i>
-                                        <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
-                                    </label>
+                                    <?php if($customer->Img ===  'avatar-default.png'): ?>
+                                        <img src="../../img/KhachHang/avatar-default.png" alt="Avatar" class="avatar-img" id="image_preview">
+                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                            <i class="fas fa-camera fa-lg"></i>
+                                            <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
+                                        </label>
+                                    <?php else: ?>
+                                        <img src="../../img/KhachHang/<?= md5(trim($customer->Email)) . '/' . $customer->Img ?>"
+                                            alt="Avatar" class="avatar-img" id="image_preview">
+                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                            <i class="fas fa-camera fa-lg"></i>
+                                            <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
+                                        </label>
+                                    <?php endif; ?>
                                 </div>
-                                <input type="hidden" name="Img" value="<?= htmlspecialchars($customer['Img']) ?>">
+                                <input type="hidden" name="Img" value="<?= htmlspecialchars($customer->Img) ?>">
 
                                 <div class="mt-4 d-grid d-md-flex justify-content-center gap-3">
                                     <a href="change_password.php" class="btn btn-outline-primary">
                                         <i class="fas fa-key me-2"></i>Đổi mật khẩu
                                     </a>
-                                    <a href="sign_out.php" class="btn btn-danger">
+                                    <a href="log_out.php" class="btn btn-danger">
                                         <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                     </a>
                                 </div>
 
                                 <div class="mt-4 text-center">
-                                    <a href="payment.php" class="btn btn-primary btn-lg px-5">
+                                    <a href="../payment/index.php" class="btn btn-primary btn-lg px-5">
                                         <i class="fas fa-shopping-bag me-2"></i>Xem đơn hàng
                                     </a>
                                 </div>
@@ -270,41 +312,41 @@
 
                             <!-- Form thông tin -->
                             <div class="col-lg-7">
-                                <input type="hidden" name="Id" value="<?= $customer['Id'] ?>">
+                                <input type="hidden" name="Id" value="<?= $customer->Id ?>">
 
                                 <div class="row g-4">
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Họ</label>
-                                        <input type="text" name="LastName" value="<?= htmlspecialchars($customer['LastName']) ?>"
+                                        <input type="text" name="LastName" value="<?= htmlspecialchars($customer->LastName) ?>"
                                             class="form-control" readonly>
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Tên</label>
-                                        <input type="text" name="FirstName" value="<?= htmlspecialchars($customer['FirstName']) ?>"
+                                        <input type="text" name="FirstName" value="<?= htmlspecialchars($customer->FirstName) ?>"
                                             class="form-control" readonly>
                                     </div>
 
                                     <div class="col-12">
                                         <label class="form-label fw-semibold">Số điện thoại</label>
-                                        <input type="text" name="Phone" value="<?= htmlspecialchars($customer['Phone']) ?>"
+                                        <input type="text" name="Phone" value="<?= htmlspecialchars($customer->Phone) ?>"
                                             class="form-control" readonly>
                                     </div>
 
                                     <div class="col-12">
                                         <label class="form-label fw-semibold">Email</label>
-                                        <input type="email" name="Email" value="<?= htmlspecialchars($customer['Email']) ?>"
+                                        <input type="email" name="Email" value="<?= htmlspecialchars($customer->Email) ?>"
                                             class="form-control" readonly>
                                     </div>
 
                                     <div class="col-md-6">
                                         <label class="form-label fw-semibold">Ngày sinh</label>
-                                        <input type="date" name="DateOfBirth" value="<?= $customer['DateOfBirth'] ?>"
+                                        <input type="date" name="DateOfBirth" value="<?= $customer->DateOfBirth ?>"
                                             class="form-control" readonly>
                                     </div>
 
                                     <div class="col-12">
                                         <label class="form-label fw-semibold">Địa chỉ nhận hàng</label>
-                                        <input type="text" name="Address" value="<?= htmlspecialchars($customer['Address']) ?>"
+                                        <input type="text" name="Address" value="<?= htmlspecialchars($customer->Address) ?>"
                                             class="form-control" readonly>
                                     </div>
 
@@ -313,7 +355,7 @@
                                         <button type="button" id="btnCancel" class="btn btn-secondary me-3 px-4">
                                             <i class="fas fa-times me-2"></i>Hủy
                                         </button>
-                                        <button type="submit" class="btn btn-primary px-5">
+                                        <button type="submit" name="ChangeButton" class="btn btn-primary px-5">
                                             <i class="fas fa-save me-2"></i>Lưu thay đổi
                                         </button>
                                     </div>

@@ -1,11 +1,7 @@
 <?php
     session_start();
-
-    $signInSuccessMessage = $_SESSION['SignInSuccessMessage'] ?? '';
-    unset($_SESSION['SignInSuccessMessage']);
-?>
-
-<?php
+    $signUpSuccessMessage = $_SESSION['SignUpSuccessMessage'] ?? '';
+    unset($_SESSION['SignUpSuccessMessage']);
     include '../../models/Customer.php';
     include '../../controllers/CustomerController.php';
 
@@ -228,9 +224,9 @@
     <div class="login-table">
         <h2>Đăng nhập</h2>
 
-        <?php if (!empty($signInSuccessMessage)): ?>
+        <?php if (!empty($signUpSuccessMessage)): ?>
             <div class="alert alert-success alert-dismissible fade show">
-                <strong>Đăng ký thành công!</strong> <?= htmlspecialchars($signInSuccessMessage) ?>
+                <strong><?= htmlspecialchars($signUpSuccessMessage) ?></strong>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>

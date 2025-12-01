@@ -1,8 +1,14 @@
 <?php
-    session_start();
-
     $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
     $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
+
+    if ($customerId) {
+        require_once '../../controllers/CartController.php'; 
+        $cartController = new CartController();
+        $totalCartItems = $cartController->getTotal($customerId);
+    } else {
+        $totalCartItems = 0;
+    }
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -279,7 +285,7 @@
         <div class="menu-icons">
             <a href="../contact/index.php"><i class="fas fa-phone-alt"></i></a>
             <a href="../cart/index.php" class="cart">
-                <i class="fas fa-shopping-cart"></i><sup>0</sup>
+                <i class="fas fa-shopping-cart"></i><sup><?php echo $totalCartItems; ?></sup>
             </a>
             <a href="../customer/profile.php"><i class="fas fa-user"></i></a>
         </div>

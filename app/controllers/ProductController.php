@@ -170,49 +170,54 @@
                 return $products;
             }
 
-            // public function getRelatedProducts(int $storeId, int $categoryId, int $productId)
-            // {
-            //     global $hostname, $username, $password, $dbname, $port;
-            //     $db = new mysqli($hostname, $username, $password, $dbname, $port);
+            public function getRelatedProducts(int $storeId, int $productId)
+            {
+                global $hostname, $username, $password, $dbname, $port;
+                $db = new mysqli($hostname, $username, $password, $dbname, $port);
 
-            //     $sql = "SELECT p.Id, p.Title, p.Content, p.Img, p.Price, p.Rate, p.CreateAt, p.UpdateAt, 
-            //                 c.Id AS CategoryId, c.Title AS CategoryTitle, s.Id as StoreId, s.StoreName AS StoreName
-            //             FROM product p
-            //             JOIN category c ON p.CategoryId = c.Id
-            //             JOIN storeproduct sp on p.Id = sp.ProductId
-            //             JOIN store s on sp.StoreId = s.Id
-            //             WHERE p.Id <> " . intval($productId) . " AND c.Id = (SELECT CategoryId FROM product WHERE Id = " . intval($productId) . ")";
-            //     if ($categoryId > 0) {
-            //         $sql .= " WHERE c.Id = " . intval($categoryId);
-            //     }
-            //     if ($storeId > 0) {
-            //         $sql .= ($categoryId > 0 ? " AND " : " WHERE ") . " s.Id = " . intval($storeId) . " and sp.IsAvailable = 1";
-            //     }
-            //     $result = $db->query($sql);
+                $sql = "SELECT p.Id, p.Title, p.Content, p.Img, p.Price, p.Rate, p.CreateAt, p.UpdateAt, 
+                            c.Id AS CategoryId, c.Title AS CategoryTitle";
+                            ", s.Id as StoreId, s.StoreName AS StoreName
+                        FROM product p
+                        JOIN category c ON p.CategoryId = c.Id
+                        JOIN storeproduct sp on p.Id = sp.ProductId
+                        JOIN store s on sp.StoreId = s.Id
+                        WHERE p.Id <> " . intval($productId) . " AND c.Id = (SELECT CategoryId FROM product WHERE Id = " . intval($productId) . ")";
+                if ($storeId > 0) {
+                    $sql .= ", s.Id as StoreId, s.StoreName AS StoreName
+                        FROM product p
+                        JOIN category c ON p.CategoryId = c.Id
+                        JOIN storeproduct sp on p.Id = sp.ProductId
+                        JOIN store s on sp.StoreId = s.Id
+                        WHERE p.Id <> " . intval($productId) . " AND c.Id = (SELECT CategoryId FROM product WHERE Id = " . intval($productId) . ") AND s.Id = " . intval($storeId) . " and sp.IsAvailable = 1";
+                }
+                else{
+                    $sql .= " FROM product p JOIN category c ON p.CategoryId = c.Id
+                        WHERE p.Id <> " . intval($productId) . " AND c.Id = (SELECT CategoryId FROM product WHERE Id = " . intval($productId) . ")";
+                }
+                $result = $db->query($sql);
 
-            //     $products = [];
-            //     if ($result->num_rows > 0) {
-            //         while ($row = $result->fetch_assoc()) {
-            //             $product = new Product();
-            //             $product->Id = $row['Id'];
-            //             $product->Title = $row['Title'];
-            //             $product->Content = $row['Content'];
-            //             $product->Img = $row['Img'];
-            //             $product->Price = $row['Price'];
-            //             $product->Rate = $row['Rate'];
-            //             $product->CreateAt = $row['CreateAt'];
-            //             $product->UpdateAt = $row['UpdateAt'];
-            //             $product->CategoryId = $row['CategoryId'];
-            //             $product->CategoryTitle = $row['CategoryTitle'];
-            //             $product->StoreId = $row['StoreId'];
-            //             $product->StoreName = $row['StoreName'];
-            //             $products[] = $product;
-            //         }
-            //     }
+                $products = [];
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $product = new Product();
+                        $product->Id = $row['Id'];
+                        $product->Title = $row['Title'];
+                        $product->Content = $row['Content'];
+                        $product->Img = $row['Img'];
+                        $product->Price = $row['Price'];
+                        $product->Rate = $row['Rate'];
+                        $product->CreateAt = $row['CreateAt'];
+                        $product->UpdateAt = $row['UpdateAt'];
+                        $product->CategoryId = $row['CategoryId'];
+                        $product->CategoryTitle = $row['CategoryTitle'];
+                        $products[] = $product;
+                    }
+                }
 
-            //     $db->close();
-            //     return $products;
-            // }
+                $db->close();
+                return $products;
+            }
         }
     }
 ?>
