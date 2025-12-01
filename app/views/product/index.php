@@ -1,25 +1,27 @@
 <?php
-    session_start();
-    require_once '../../controllers/ProductController.php';
-    require_once '../../controllers/CategoryController.php';
-    require_once '../../controllers/StoreController.php';
+// session_start();
+require_once '../header.php';
 
-    $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
-    $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
-    $limits = 5;
+require_once '../../controllers/ProductController.php';
+require_once '../../controllers/CategoryController.php';
+require_once '../../controllers/StoreController.php';
 
-    $categoryController = new CategoryController();
-    $categories = $categoryController->getAllCategories();
+$categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
+$storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
+$limits = 5;
 
-    $storeController = new StoreController();
-    $stores = $storeController->getAllStores();
+$categoryController = new CategoryController();
+$categories = $categoryController->getAllCategories();
 
-    $productController = new ProductController();
-    $products = $productController->getAllProducts($storeId, $categoryId);
-    $featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
-    $latestProducts = $productController->getLatestProducts($storeId, $limits);
+$storeController = new StoreController();
+$stores = $storeController->getAllStores();
 
-    $customerId = $_SESSION['CustomerId'] ?? 0;
+$productController = new ProductController();
+$products = $productController->getAllProducts($storeId, $categoryId);
+$featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
+$latestProducts = $productController->getLatestProducts($storeId, $limits);
+
+$customerId = $_SESSION['CustomerId'] ?? 0;
 
 ?>
 <!DOCTYPE html>
@@ -294,7 +296,8 @@
             height: 4.5rem;
             display: -webkit-box;
             -webkit-line-clamp: 3;
-            line-clamp: 3; /* Standard property for compatibility */
+            line-clamp: 3;
+            /* Standard property for compatibility */
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin-bottom: 15px;
@@ -425,7 +428,6 @@
 </head>
 
 <body>
-    <?php require_once '../header.php'; ?>
 
     <div class="container-fluid page-header">
         <h1 class="display-6 fw-bold font-monospace">Trung Nguyên Cà Phê</h1>
@@ -445,18 +447,18 @@
         <form method="get" action="" id="branchForm">
             <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
                 <option value="">-- Chọn chi nhánh --</option>
-                    <?php if (!empty($stores)): ?>
-                        <?php foreach ($stores as $store): ?>
-                            <?php
-                                $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
-                                $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
-                                $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
-                            ?>
-                            <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
+                <?php if (!empty($stores)): ?>
+                    <?php foreach ($stores as $store): ?>
+                        <?php
+                        $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
+                        $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
+                        $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
+                        ?>
+                        <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
+                        </option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </select>
             <input type="hidden" name="category" value="<?php echo $categoryId; ?>">
         </form>
@@ -471,8 +473,8 @@
                         <li><a href="index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
                         <?php foreach ($categories as $cat): ?>
                             <?php
-                                $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                                $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
+                            $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
+                            $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
                             ?>
                             <li>
                                 <a href="index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
@@ -492,10 +494,10 @@
                 <?php if (!empty($featuredProducts)): ?>
                     <?php foreach ($featuredProducts as $product): ?>
                         <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
                             <a href="detail.php">
@@ -505,8 +507,8 @@
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
                                 <?php endif; ?>
                                 <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
-                                    $_SESSION['currertStoreId'] = $storeId;
+                                $_SESSION['currentProductId'] = $p_Id;
+                                $_SESSION['currertStoreId'] = $storeId;
                                 ?>
                             </a>
                             <div>
@@ -525,10 +527,10 @@
                 <?php if (!empty($latestProducts)): ?>
                     <?php foreach ($latestProducts as $product): ?>
                         <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                         ?>
                         <div class="featured-product">
                             <a href="detail.php">
@@ -538,7 +540,7 @@
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
                                 <?php endif; ?>
                                 <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
+                                $_SESSION['currentProductId'] = $p_Id;
                                 ?>
                             </a>
                             <div>
@@ -587,13 +589,13 @@
                 <?php if (!empty($products)): ?>
                     <?php foreach ($products as $product): ?>
                         <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Content = is_object($product) ? $product->Content : (isset($product['Content']) ? $product['Content'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Rate = is_object($product) ? $product->Rate : (isset($product['Rate']) ? $product['Rate'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                            $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
+                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                        $p_Content = is_object($product) ? $product->Content : (isset($product['Content']) ? $product['Content'] : '');
+                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                        $p_Rate = is_object($product) ? $product->Rate : (isset($product['Rate']) ? $product['Rate'] : 0);
+                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                        $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
                         ?>
                         <div class="card">
                             <a href="detail.php">
@@ -603,7 +605,7 @@
                                     <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
                                 <?php endif; ?>
                                 <?php
-                                    $_SESSION['currentProductId'] = $p_Id;
+                                $_SESSION['currentProductId'] = $p_Id;
                                 ?>
                             </a>
                             <div class="card-body">
