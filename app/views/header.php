@@ -71,7 +71,7 @@ $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : n
     }
 
     .menu-nav a {
-        margin-right: 35px;
+        margin-right: 40px;
         text-decoration: none;
         color: #37474f;
         font-weight: 600;
@@ -81,13 +81,14 @@ $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : n
     }
 
     .menu-nav a:hover {
+        margin-left: 8px;
         color: #ffb300;
         transform: scale(1.1);
     }
 
     .menu-nav a.dropdown::after {
         content: " ▼";
-        font-size: 10px;
+        font-size: 20px;
     }
 
     .logo img {
@@ -188,7 +189,7 @@ $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : n
         left: 0;
         background: white;
         padding: 12px 0;
-        width: 220px;
+        width: 200px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         display: none;

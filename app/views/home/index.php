@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - Trung Nguyên Cà Phê</title>
+    <title> Trang chủ - Trung Nguyên Cà Phê</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -12,11 +12,9 @@
         body {
             background-color: #fff1e0;
             padding-top: 150px;
-            /* tránh bị header che */
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* HERO */
         .hero {
             text-align: center;
             padding: 90px 20px 10px;
@@ -46,7 +44,6 @@
             line-height: 1.8;
         }
 
-        /* SLIDER */
         .banner-slider {
             max-width: 1200px;
             height: 600px;
@@ -121,10 +118,8 @@
 
 <body>
 
-    <!-- HEADER -->
     <?php include "../header.php"; ?>
 
-    <!-- HERO -->
     <section class="hero">
         <h1>TRUNG NGUYÊN CÀ PHÊ</h1>
         <h2>CÀ PHÊ NĂNG LƯỢNG - CÀ PHÊ ĐỔI ĐỜI</h2>
@@ -139,7 +134,6 @@
         </p>
     </section>
 
-    <!-- SLIDER -->
     <div class="banner-slider">
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
@@ -155,22 +149,64 @@
     </div>
 
     <script>
-        let index = 0;
-        const slides = document.querySelectorAll('.slide');
         const slider = document.querySelector('.slider-container');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.querySelector('.prev');
+        const nextBtn = document.querySelector('.next');
 
-        function showSlide(i) {
-            index = (i + slides.length) % slides.length;
-            slider.style.transform = `translateX(-${index * 100}%)`;
+        const originalTotal = slides.length;
+
+        // Clone first và last
+        const firstClone = slides[0].cloneNode(true);
+        const lastClone = slides[originalTotal - 1].cloneNode(true);
+
+        slider.appendChild(firstClone);
+        slider.insertBefore(lastClone, slider.firstChild);
+
+        // Lấy lại danh sách slide sau khi clone
+        const updatedSlides = document.querySelectorAll('.slide');
+        const totalSlides = updatedSlides.length;
+
+        let currentIndex = 1; // bắt đầu từ slide gốc đầu tiên
+        slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+
+        let interval = setInterval(() => moveSlide(1), 5000);
+
+        function moveSlide(direction) {
+            currentIndex += direction;
+            slider.style.transition = 'transform 0.5s ease-in-out';
+            slider.style.transform = `translateX(-${currentIndex * 100}%)`;
         }
 
-        document.querySelector('.prev').onclick = () => showSlide(index - 1);
-        document.querySelector('.next').onclick = () => showSlide(index + 1);
+        // Khi chuyển slide xong, reset position nếu cần
+        slider.addEventListener('transitionend', () => {
+            if (currentIndex === 0) { // nhảy từ clone cuối về slide cuối
+                slider.style.transition = 'none';
+                currentIndex = originalTotal;
+                slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+            } else if (currentIndex === totalSlides - 1) { // nhảy từ clone đầu về slide đầu
+                slider.style.transition = 'none';
+                currentIndex = 1;
+                slider.style.transform = `translateX(-${currentIndex * 100}%)`;
+            }
+        });
 
-        setInterval(() => showSlide(index + 1), 5000);
+        prevBtn.addEventListener('click', () => {
+            moveSlide(-1);
+            resetInterval();
+        });
+        nextBtn.addEventListener('click', () => {
+            moveSlide(1);
+            resetInterval();
+        });
+
+        function resetInterval() {
+            clearInterval(interval);
+            interval = setInterval(() => moveSlide(1), 5000);
+        }
     </script>
 
-    <!-- FOOTER -->
+
     <?php include "../footer.php"; ?>
 
 </body>

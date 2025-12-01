@@ -147,8 +147,8 @@ if (!in_array($page, $allowed_pages)) {
             <img src="../../img/Logo/logo.jpg" alt="Logo" class="navbar-logo">
             <div class="navbar-title fw-bolder">Xin chào, Admin</div>
         </div>
-
-        <a href="?page=dashboard"><i class="fas fa-home"></i><span> Trang chủ khách hàng</span></a>
+        <a href="../../views/home/index.php" class="no-ajax"><i class="fas fa-arrow-left"></i></i><span> Trang khách</span></a>
+        <a href="?page=dashboard"><i class="fas fa-home"></i><span> Trang quản trị</span></a>
         <a href="?page=catagory"><i class="fas fa-list-alt"></i><span> Quản lý danh mục</span></a>
         <a href="?page=product"><i class="fas fa-glass-martini-alt"></i><span> Quản lý sản phẩm</span></a>
         <a href="?page=store"><i class="fas fa-store"></i><span> Quản lý cửa hàng</span></a>
@@ -208,6 +208,11 @@ if (!in_array($page, $allowed_pages)) {
 
         // Click menu
         $('.vertical-navbar a').click(function(e) {
+            if ($(this).hasClass('no-ajax')) {
+                // cho phép link load bình thường
+                return;
+            }
+
             e.preventDefault();
             let url = $(this).attr('href');
             let page = url.split('=')[1];
@@ -220,15 +225,6 @@ if (!in_array($page, $allowed_pages)) {
                 page: page
             }, '', '?page=' + page);
         });
-
-        // Khi back/forward browser
-        window.onpopstate = function(event) {
-            if (event.state && event.state.page) {
-                loadPage(event.state.page);
-            } else {
-                loadPage('dashboard');
-            }
-        };
     </script>
 </body>
 
