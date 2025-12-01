@@ -13,6 +13,8 @@
 
     $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
     $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
+    $searchString = isset($_GET['searchString']) ? $_GET['searchString'] : "";
+    $sort = isset($_GET['sort']) ? $_GET['sort'] : "";
     $limits = 5;
 
     $categoryController = new CategoryController();
@@ -22,7 +24,7 @@
     $stores = $storeController->getAllStores();
 
     $productController = new ProductController();
-    $products = $productController->getAllProducts($storeId, $categoryId);
+    $products = $productController->getAllProducts($storeId, $categoryId, $sort, $searchString);
     $featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
     $latestProducts = $productController->getLatestProducts($storeId, $limits);
 
@@ -481,6 +483,8 @@
                     <?php endif; ?>
             </select>
             <input type="hidden" name="category" value="<?php echo $categoryId; ?>">
+            <input type="hidden" name="searchString" value="<?php echo htmlspecialchars($searchString); ?>">
+            <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
         </form>
     </div>
 
@@ -585,15 +589,26 @@
         <main class="main-content">
             <div class="filter-bar">
                 <form method="get" action="#" class="search-container">
-                    <input type="search" name="searchTerm" placeholder="Tìm kiếm sản phẩm...">
-                    <i class="fas fa-search search-icon"></i>
+                    <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
+                    <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
+                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+
+                    <input type="search" name="searchString" placeholder="Tìm kiếm sản phẩm..." value="<?php echo htmlspecialchars($searchString) ?>">
+                    <button type="submit" style="position: absolute; right: 0; top: 0; height: 100%; width: 40px; background: none; border: none; cursor: pointer; color: #37474f;">
+                        <i class="fas fa-search search-icon" style="position: static; transform: none;"></i>
+                    </button>
                 </form>
-                <form method="get" action="#">
-                    <select onchange="this.form.submit()">
-                        <option value="">Tất cả</option>
-                        <option value="price_desc">Giá cao đến thấp</option>
-                        <option value="price_asc">Giá thấp đến cao</option>
-                        <option value="rate_desc">Đánh giá cao nhất</option>
+                <form method="get" action="#" id="sortForm">
+                    <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
+                    <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
+                    <input type="hidden" name="searchString" value="<?php echo htmlspecialchars($searchString); ?>">
+
+                    <select name="sort" onchange="document.getElementById('sortForm').submit()">
+                        <option value="" <?php echo $sort == '' ? 'selected' : ''; ?>>Tất cả</option>
+                        <option value="price_desc" <?php echo $sort == 'price_desc' ? 'selected' : ''; ?>>Giá cao đến thấp</option>
+                        <option value="price_asc" <?php echo $sort == 'price_asc' ? 'selected' : ''; ?>>Giá thấp đến cao</option>
+                        <option value="rate_desc" <?php echo $sort == 'rate_desc' ? 'selected' : ''; ?>>Đánh giá cao nhất</option>
+                        <option value="latest_desc" <?php echo $sort == 'latest_desc' ? 'selected' : ''; ?>>Sản phẩm mới nhất</option>
                     </select>
                 </form>
             </div>

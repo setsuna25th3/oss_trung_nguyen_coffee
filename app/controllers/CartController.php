@@ -78,13 +78,14 @@
                 }
             }
 
-            public function deleteCartItem($cartItemId) {
+            public function deleteItemInCart($customerId, $productId, $storeId) {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "DELETE FROM cart WHERE Id = " . (int)$cartItemId;
-                $result = $db->query($sql);
-                $db->close();
-                return $result;
+                $sql = "DELETE FROM cart WHERE CustomerId = ? AND ProductId =  ? AND StoreId = ?";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("iii", $customerId, $productId, $storeId);
+                $result = $stmt->execute();
+                return $result && ($stmt->affected_rows > 0);
             }
         }
     }

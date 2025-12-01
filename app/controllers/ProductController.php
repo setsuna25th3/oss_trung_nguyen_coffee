@@ -4,7 +4,7 @@
         require_once __DIR__ .'/../models/Product.php';
 
         class ProductController {
-            public function getAllProducts(int $storeId, int $categoryId)
+            public function getAllProducts(int $storeId, int $categoryId, $sortString, $searchString)
             {
                 global $hostname, $username, $password, $dbname, $port;
                 $db = new mysqli($hostname, $username, $password, $dbname, $port);
@@ -25,6 +25,30 @@
                         $sql .= " FROM product p JOIN category c ON p.CategoryId = c.Id";
                     }
                 }
+                if(!empty($searchString)){
+                    if($categoryId > 0){
+                        $sql .= " AND p.Title LIKE '%" . $searchString . "%'";
+                    }
+                    else{
+                        $sql .= " WHERE p.Title LIKE '%" . $searchString . "%'";
+                    }
+                }
+                $orderBy = " p.Id DESC";
+                switch($sortString){
+                    case 'price_desc':
+                        $orderBy = ' p.Price DESC';
+                        break;
+                    case 'price_asc':
+                        $orderBy = ' p.Price ASC';
+                        break;
+                    case 'rate_desc':
+                        $orderBy = ' p.Rate DESC';
+                        break;
+                    case 'latest_desc':
+                        $orderBy = ' p.Id DESC';
+                        break;
+                }
+                $sql .= " ORDER BY" . $orderBy;
                 $result = $db->query($sql);
 
                 $products = [];

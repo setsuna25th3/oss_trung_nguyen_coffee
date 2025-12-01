@@ -3,17 +3,22 @@
     require_once __DIR__ .'/../../controllers/CategoryController.php';
     require_once __DIR__ .'/../../controllers/CartController.php';
     require_once __DIR__ .'/../../controllers/ProductController.php';
+    require_once __DIR__ .'/../../controllers/StoreController.php';
 
     $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : 0;
     $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
-    $storeId = 0;
+    $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
     $total = 0;
+    $_SESSION['storeId'] = $storeId;
+
     $categoryController = new CategoryController();
     $cartController = new CartController();
     $productController = new ProductController();
+    $storeController = new StoreController();
 
     $categories = $categoryController->getAllCategories();
     $carts = $cartController->getCartByCustomerId($customerId, $storeId);
+    $stores = $storeController->getAllStores();
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -285,6 +290,23 @@
         </aside>
 
         <main class="main-content">
+            <form method="get" action="" id="branchForm">
+                <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
+                    <option value="">-- Chọn chi nhánh --</option>
+                        <?php if (!empty($stores)): ?>
+                            <?php foreach ($stores as $store): ?>
+                                <?php
+                                    $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
+                                    $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
+                                    $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
+                                ?>
+                                <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                </select>
+            </form>
             <table>
                 <thead>
                     <tr>
@@ -293,7 +315,7 @@
                         <th>Giá</th>
                         <th>Số lượng</th>
                         <th>Tổng tiền</th>
-                        <th>Xóa</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -314,7 +336,16 @@
                                 $total += $itemTotal;
                             ?>
                             <td><?php echo number_format($itemTotal, 0, ',', '.') ?> VNĐ</td>
-                            <td><button class="btn">Xóa</button></td>
+                            <td>
+                                <?php if ($storeId): ?>
+                                    <form method="post" action="remove_product.php">
+                                        <input type="hidden" name="customerId" value="<?php echo $cart->CustomerId; ?>">
+                                        <input type="hidden" name="productId" value="<?php echo $product->Id; ?>">
+                                        <input type="hidden" name="storeId" value="<?php echo $cart->StoreId; ?>">
+                                        <button type="submit" class="btn">Xóa</button>
+                                    </form>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -323,7 +354,9 @@
             <div class="checkout-box">
                 <h4>Tổng tiền:</h4>
                 <p><?php echo number_format($total, 0, ',', '.'); ?> VNĐ</p>
-                <button class="btn">Thanh toán</button>
+                <?php if ($storeId > 0 && $total > 0): ?>
+                    <button class="btn">Thanh toán</button>
+                <?php endif; ?>
                 <!-- xử lý thanh toán -->
             </div>
         </main>

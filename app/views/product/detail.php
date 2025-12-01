@@ -191,7 +191,7 @@
                                 <button class="btn btn-light border rounded-circle" id="increaseQuantity"><i class="fa fa-plus"></i></button>
                             </div>
 
-                            <form method="post" action="add_to_cart.php?id=<?php echo $product->Id; ?>">
+                            <form method="post" action="../cart/add_to_cart.php?id=<?php echo $product->Id; ?>">
                                 <input type="hidden" id="hiddenQuantity" name="quantity" value="1">
                                 <button type="submit" class="btn btn-outline-primary rounded-pill px-4 py-2 mb-4">
                                     <i class="fa fa-shopping-bag me-2"></i>Thêm
