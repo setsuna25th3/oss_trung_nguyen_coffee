@@ -1,11 +1,19 @@
 <?php
     session_start();
     require_once __DIR__ .'/../../controllers/CategoryController.php';
+    require_once __DIR__ .'/../../controllers/CartController.php';
+    require_once __DIR__ .'/../../controllers/ProductController.php';
 
+    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : 0;
     $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
     $storeId = 0;
+    $total = 0;
     $categoryController = new CategoryController();
+    $cartController = new CartController();
+    $productController = new ProductController();
+
     $categories = $categoryController->getAllCategories();
+    $carts = $cartController->getCartByCustomerId($customerId, $storeId);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -289,24 +297,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php for ($i = 1; $i <= 4; $i++): ?>
+                    <?php $total =  0; ?>
+                    <?php foreach ($carts as $cart): ?>
                         <tr>
-                            <!-- load dữ liệu -->
-                            <!-- <td><img src="Images/SanPham/sample.jpg" class="product-img" alt="Sản phẩm"></td>
-                            <td>Cà phê sữa đá <?= $i ?></td>
-                            <td>25.000 VND</td>
-                            <td>1</td>
-                            <td>25.000 VND</td>
-                            <td><button class="btn">Xóa</button></td> -->
+                            <?php
+                                $product = $productController->getProductById($cart->ProductId);
+                            ?>
+                            <td>
+                                <img src="../../img/SanPham/<?php echo htmlspecialchars($product->Img) ?>" class="product-img" alt="Sản phẩm">
+                            </td>
+                            <td><?php echo htmlspecialchars($product->Title) ?></td>
+                            <td><?php echo number_format($product->Price, 0, ',', '.') ?> VNĐ</td>
+                            <td><?php echo htmlspecialchars($cart->Quantity) ?></td>
+                            <?php 
+                                $itemTotal = $product->Price * $cart->Quantity;
+                                $total += $itemTotal;
+                            ?>
+                            <td><?php echo number_format($itemTotal, 0, ',', '.') ?> VNĐ</td>
+                            <td><button class="btn">Xóa</button></td>
                         </tr>
-                    <?php endfor; ?>
+                    <?php endforeach; ?>
                 </tbody>
             </table>
 
             <div class="checkout-box">
                 <h4>Tổng tiền:</h4>
-                <!-- xử lý tính -->
-                <!-- <p>100.000 VND</p> -->
+                <p><?php echo number_format($total, 0, ',', '.'); ?> VNĐ</p>
                 <button class="btn">Thanh toán</button>
                 <!-- xử lý thanh toán -->
             </div>
