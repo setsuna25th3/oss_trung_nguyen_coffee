@@ -336,20 +336,20 @@ foreach ($stores as $store) {
                                 <tbody>
                                     <?php $storeTotal = 0; ?>
                                     <?php foreach ($storeCarts as $cart): ?>
-                                        <?php
-                                        $product = $productController->getProductById($cart->ProductId);
-                                        $itemTotal = $product->Price * $cart->Quantity;
-                                        $storeTotal += $itemTotal;
-                                        ?>
-                                        <tr>
+                                        <tr class="product-row">
+                                            <?php
+                                            $product = $productController->getProductById($cart->ProductId);
+                                            $itemTotal = $product->Price * $cart->Quantity;
+                                            $storeTotal += $itemTotal;
+                                            ?>
                                             <td>
                                                 <input type="checkbox" class="product-checkbox" value="<?php echo $product->Id; ?>" data-item-total="<?php echo $itemTotal; ?>" checked>
                                             </td>
                                             <td>
-                                                <img src="../../img/SanPham/<?php echo htmlspecialchars($product->Img) ?>" class="product-img" alt="Sản phẩm">
+                                                <img src="../../img/SanPham/<?php echo htmlspecialchars($product->Img); ?>" class="product-img" alt="Sản phẩm">
                                             </td>
-                                            <td><?php echo htmlspecialchars($product->Title) ?></td>
-                                            <td><?php echo number_format($product->Price, 0, ',', '.') ?> VNĐ</td>
+                                            <td><?php echo htmlspecialchars($product->Title); ?></td>
+                                            <td><?php echo number_format($product->Price, 0, ',', '.'); ?> VNĐ</td>
 
                                             <td>
                                                 <input type="number" class="quantity-input"
@@ -366,10 +366,9 @@ foreach ($stores as $store) {
                                                     Xóa
                                                 </button>
                                             </td>
-
-
                                         </tr>
                                     <?php endforeach; ?>
+
                                     <tr>
                                         <td colspan="7">
                                             <form style="text-align: right;" method="post" action="checkout_process.php" class="cartForm">
@@ -401,7 +400,7 @@ foreach ($stores as $store) {
             // Duyệt tất cả sản phẩm trong giỏ
             document.querySelectorAll('.store-section tbody tr').forEach(row => {
                 const checkbox = row.querySelector('.product-checkbox');
-                if (checkbox && checkbox.checked) { // nếu muốn tính theo sản phẩm được chọn
+                if (checkbox && checkbox.checked) {
                     const qty = parseInt(row.querySelector('.quantity-input').value);
                     totalQty += qty;
                 }
@@ -410,7 +409,20 @@ foreach ($stores as $store) {
             // Cập nhật số lượng lên header
             const cartCount = document.getElementById('cartCount');
             if (cartCount) cartCount.textContent = totalQty;
+
+            // Kiểm tra nếu không còn store-section nào -> hiển thị giỏ hàng trống
+            const mainContent = document.querySelector('.main-content');
+            if (!document.querySelectorAll('.store-section').length) {
+                if (!document.querySelector('.empty-cart')) {
+                    const emptyCart = document.createElement('p');
+                    emptyCart.className = 'empty-cart';
+                    emptyCart.textContent = 'Giỏ hàng của bạn đang trống.';
+                    mainContent.appendChild(emptyCart);
+                }
+            }
+
         }
+
         document.addEventListener('DOMContentLoaded', function() {
 
             function updateStoreTotal(storeId) {
@@ -439,7 +451,6 @@ foreach ($stores as $store) {
                     const storeId = this.closest('.store-section').dataset.storeId;
                     updateStoreTotal(storeId);
                     updateHeaderCart();
-
                 });
             });
 
@@ -455,9 +466,7 @@ foreach ($stores as $store) {
                     const price = parseInt(row.querySelector('td:nth-child(4)').textContent.replace(/\D/g, ''));
                     const newTotal = price * quantity;
 
-                    // Cập nhật item-total
                     row.querySelector('.item-total').textContent = newTotal.toLocaleString('vi-VN') + ' VNĐ';
-                    // Cập nhật data-item-total của checkbox
                     const checkbox = row.querySelector('.product-checkbox');
                     if (checkbox) checkbox.setAttribute('data-item-total', newTotal);
 
@@ -493,15 +502,14 @@ foreach ($stores as $store) {
                                 row.remove();
 
                                 const tbody = section.querySelector('tbody');
-                                if (!tbody.querySelector('tr')) {
-                                    section.remove();
-                                } else {
-                                    updateStoreTotal(storeId);
+                                if (!tbody.querySelectorAll('tr.product-row').length) {
+                                    section.remove(); // Xóa cả section nếu không còn sản phẩm
                                 }
 
+
+                                updateStoreTotal(storeId);
                                 updateHeaderCart();
                             }
-
                         });
                 });
             });
