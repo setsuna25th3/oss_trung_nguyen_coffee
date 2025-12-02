@@ -7,6 +7,7 @@
     $firstName = $_POST['FirstName'] ?? ' ';
     $email = $_POST['Email'] ?? ' ';
     $phone = $_POST['Phone'] ?? ' ';
+    $address = $_POST['Address'] ?? ' ';
     
     $UPLOAD_DIR = '../../img/KhachHang/';
 
@@ -51,10 +52,11 @@
         $customer->FirstName = $firstName;
         $customer->Email = trim($email);
         $customer->Phone = trim($phone);
-        $customer->Address = '';
+        $customer->Address = $address;
         $customer->DateOfBirth = null;
         $customer->IsActive = 1;
         $customer->Password = password_hash($_POST['Password'], PASSWORD_DEFAULT);
+        $confirmPass = $_POST['ConfirmPassword'] ?? ' ';
         $customer->RandomKey = '';
         $email_exists = $customerController->checkDuplicateByEmail($customer);
 
@@ -63,19 +65,24 @@
             $_SESSION['SignUpErrorMessage'] = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
         }
         else{
-            $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
-            if ($img_path === false){
-                $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại do lỗi tải ảnh. Vui lòng thử lại.';
+            if (!password_verify($confirmPass, $customer->Password)){
+                $_SESSION['SignUpErrorMessage'] = 'Mật khẩu xác nhận không đúng.';
             }
             else{
-                $customer->Img = $img_path;
-                $isSuccess = $customerController->signUp($customer);
-                if ($isSuccess) {
-                    $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
-                    header('Location: sign_in.php');
-                    exit();
-                } else {
-                    $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
+                $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
+                if ($img_path === false){
+                    $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại do lỗi tải ảnh. Vui lòng thử lại.';
+                }
+                else{
+                    $customer->Img = $img_path;
+                    $isSuccess = $customerController->signUp($customer);
+                    if ($isSuccess) {
+                        $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
+                        header('Location: sign_in.php');
+                        exit();
+                    } else {
+                        $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
+                    }
                 }
             }
         }
@@ -264,6 +271,32 @@
             padding: 20px;
         }
     }
+
+    .hidden-file-input {
+        display: none !important;
+    }
+
+    .avatar-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .btn-upload-custom {
+        margin-top: 10px;
+        background-color: #ffb300;
+        padding: 8px 20px;
+        border-radius: 25px;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-upload-custom:hover {
+        background-color: #ff9800;
+        transform: translateY(-2px);
+    }
 </style>
 
 <div class="container-fluid signup-container">
@@ -278,12 +311,10 @@
         <?php endif; ?>
 
         <form method="post" action="sign_up.php" enctype="multipart/form-data">
-            <div class="text-center mb-3">
+            <div class="avatar-container mb-3">
                 <img src="../img/avatar-default.jpg" id="image_preview">
-                <div>
-                    <label for="image_upload" class="btn btn-outline-primary btn-upload">Chọn ảnh đại diện</label>
-                    <input type="file" name="ImgUpload" id="image_upload" class="d-none" accept="image/*">
-                </div>
+                <label for="image_upload" class="btn btn-upload-custom">Chọn ảnh đại diện</label>
+                <input type="file" id="image_upload" name="ImgUpload" accept="image/*" class="hidden-file-input">
             </div>
 
             <table>
@@ -304,8 +335,16 @@
                     <td><input type="password" name="Password" id="Password" class="form-control" placeholder="Nhập mật khẩu" required></td>
                 </tr>
                 <tr>
+                    <td><label for="ConfirmPassword">Nhập lại mật khẩu</label></td>
+                    <td><input type="password" name="ConfirmPassword" id="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required></td>
+                </tr>
+                <tr>
                     <td><label for="Phone">Số điện thoại</label></td>
                     <td><input type="tel" name="Phone" id="Phone" class="form-control" placeholder="Nhập số điện thoại" required value="<?php printVar($phone)?>"></td>
+                </tr>
+                <tr>
+                    <td><label for="Address">Địa chỉ</label></td>
+                    <td><input type="text" name="Address" id="Address" class="form-control" placeholder="Nhập địa chỉ" required value="<?php printVar($address) ?>"></td>
                 </tr>
                 <tr>
                     <td colspan="2"><button type="submit" name="SignUp" class="btn btn-primary mt-3">Đăng ký</button></td>

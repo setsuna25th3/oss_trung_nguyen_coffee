@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý sản phẩm</title>
+    <title>Quản lý đánh giá sản phẩm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
@@ -39,7 +39,7 @@
             margin-right: 5px;
         }
 
-        .btn-add {
+        .filter-section {
             margin-bottom: 15px;
         }
 
@@ -52,37 +52,30 @@
                 overflow-x: auto;
             }
         }
-
-        td img {
-            width: 100px;
-            height: 60px;
-            object-fit: contain;
-        }
-
-        td span.content-clamp {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.5rem;
-            height: 4.5rem;
-        }
     </style>
 </head>
 
 <body>
     <div class="container my-5">
-        <h1>Quản lý sản phẩm</h1>
+        <h1>Quản lý đánh giá sản phẩm</h1>
 
         <div class="table-wrapper">
-            <div class="d-flex justify-content-between mb-3">
-                <button class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#createModal">
-                    <i class="fa fa-plus"></i> Thêm mới sản phẩm
-                </button>
+
+            <!-- Lọc theo sản phẩm -->
+            <div class="filter-section d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex">
-                    <input type="text" class="form-control me-2" placeholder="Tìm kiếm sản phẩm...">
-                    <button class="btn btn-primary">Tìm kiếm</button>
-                    <button class="btn btn-outline-dark ms-2">Quay lại danh sách</button>
+                    <select class="form-select me-2">
+                        <option selected>Chọn sản phẩm</option>
+                        <option value="1">Cà phê Arabica</option>
+                        <option value="2">Cà phê Robusta</option>
+                        <option value="3">Cà phê Blend</option>
+                    </select>
+                    <button class="btn btn-primary">Lọc</button>
+                </div>
+                <div>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
+                        <i class="fa fa-plus"></i> Thêm đánh giá
+                    </button>
                 </div>
             </div>
 
@@ -90,39 +83,49 @@
                 <table class="table table-bordered table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Mã SP</th>
-                            <th>Tên sản phẩm</th>
-                            <th>Nội dung</th>
-                            <th>Hình ảnh</th>
-                            <th>Giá</th>
+                            <th>Mã</th>
+                            <th>Sản phẩm</th>
+                            <th>Khách hàng</th>
                             <th>Đánh giá</th>
+                            <th>Bình luận</th>
                             <th>Ngày tạo</th>
-                            <th>Ngày cập nhật</th>
-                            <th>Mã danh mục</th>
-                            <th>Tên danh mục</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Demo row -->
+                        <!-- Dữ liệu mẫu -->
                         <tr>
                             <td>1</td>
                             <td>Cà phê Arabica</td>
-                            <td><span class="content-clamp">Mô tả ngắn sản phẩm cà phê Arabica chất lượng cao...</span></td>
-                            <td><img src="https://via.placeholder.com/100x60" alt="Hình sản phẩm"></td>
-                            <td>100,000 VND</td>
-                            <td>4.5</td>
-                            <td>2024-01-01</td>
-                            <td>2024-01-05</td>
-                            <td>1</td>
-                            <td>Cà phê rang</td>
+                            <td>Nguyễn Văn A</td>
+                            <td>5</td>
+                            <td>Rất thơm và ngon!</td>
+                            <td>2025-12-01 08:00</td>
                             <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                                    <i class="fa fa-edit"></i>Sửa
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fa fa-trash"></i>Xóa
+                                </button>
                             </td>
                         </tr>
-                        <!-- Thêm các row demo khác nếu muốn -->
+                        <tr>
+                            <td>2</td>
+                            <td>Cà phê Robusta</td>
+                            <td>Trần Thị B</td>
+                            <td>4</td>
+                            <td>Hương vị đậm đà, vừa miệng.</td>
+                            <td>2025-12-01 09:15</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
+                                    <i class="fa fa-edit"></i>Sửa
+                                </button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fa fa-trash"></i>Xóa
+                                </button>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -143,25 +146,29 @@
         <div class="modal-dialog">
             <form class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Thêm sản phẩm mới</h5>
+                    <h5 class="modal-title">Thêm đánh giá mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Tên sản phẩm</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên sản phẩm">
+                        <label>Sản phẩm</label>
+                        <select class="form-select">
+                            <option selected>Chọn sản phẩm</option>
+                            <option value="1">Cà phê Arabica</option>
+                            <option value="2">Cà phê Robusta</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label>Nội dung</label>
-                        <textarea class="form-control" placeholder="Nhập mô tả sản phẩm"></textarea>
+                        <label>Khách hàng</label>
+                        <input type="text" class="form-control" placeholder="Nhập tên khách hàng">
                     </div>
                     <div class="mb-3">
-                        <label>Giá</label>
-                        <input type="text" class="form-control" placeholder="Nhập giá sản phẩm">
+                        <label>Đánh giá (1-5)</label>
+                        <input type="number" class="form-control" min="1" max="5" placeholder="Nhập số sao">
                     </div>
                     <div class="mb-3">
-                        <label>Hình ảnh</label>
-                        <input type="file" class="form-control">
+                        <label>Bình luận</label>
+                        <textarea class="form-control" placeholder="Nhập bình luận"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -177,21 +184,28 @@
         <div class="modal-dialog">
             <form class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Sửa sản phẩm</h5>
+                    <h5 class="modal-title">Sửa đánh giá</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Tên sản phẩm</label>
-                        <input type="text" class="form-control" value="Cà phê Arabica">
+                        <label>Sản phẩm</label>
+                        <select class="form-select">
+                            <option selected>Cà phê Arabica</option>
+                            <option value="2">Cà phê Robusta</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label>Nội dung</label>
-                        <textarea class="form-control">Mô tả ngắn sản phẩm cà phê Arabica chất lượng cao...</textarea>
+                        <label>Khách hàng</label>
+                        <input type="text" class="form-control" value="Nguyễn Văn A">
                     </div>
                     <div class="mb-3">
-                        <label>Giá</label>
-                        <input type="text" class="form-control" value="100,000 VND">
+                        <label>Đánh giá (1-5)</label>
+                        <input type="number" class="form-control" min="1" max="5" value="5">
+                    </div>
+                    <div class="mb-3">
+                        <label>Bình luận</label>
+                        <textarea class="form-control">Rất thơm và ngon!</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -202,40 +216,16 @@
         </div>
     </div>
 
-    <!-- View Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Chi tiết sản phẩm</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Tên sản phẩm:</strong> Cà phê Arabica</p>
-                    <p><strong>Nội dung:</strong> Mô tả ngắn sản phẩm cà phê Arabica chất lượng cao...</p>
-                    <p><strong>Giá:</strong> 100,000 VND</p>
-                    <p><strong>Ngày tạo:</strong> 2024-01-01</p>
-                    <p><strong>Ngày cập nhật:</strong> 2024-01-05</p>
-                    <p><strong>Mã danh mục:</strong> 1</p>
-                    <p><strong>Tên danh mục:</strong> Cà phê rang</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-danger">Xóa sản phẩm</h5>
+                    <h5 class="modal-title text-danger">Xóa đánh giá</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa sản phẩm này không?
+                    Bạn có chắc chắn muốn xóa đánh giá này không?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
