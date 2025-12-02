@@ -1,4 +1,4 @@
-<?php session_start();?>
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -118,10 +118,6 @@
 </head>
 
 <body>
-<<<<<<< HEAD
-=======
-
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
     <?php include "../header.php"; ?>
 
     <section class="hero">

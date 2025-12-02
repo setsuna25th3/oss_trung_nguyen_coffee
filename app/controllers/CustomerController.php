@@ -14,28 +14,6 @@ if (!class_exists('CustomerController')) {
 
             $result = $db->query($sql);
 
-<<<<<<< HEAD
-                $customer = new Customer();
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $customer->Id = $row['Id'];
-                    $customer->FirstName = $row['FirstName'];
-                    $customer->LastName = $row['LastName'];
-                    $customer->Address = $row['Address'];
-                    $customer->Phone = $row['Phone'];
-                    $customer->Email = $row['Email'];
-                    $customer->Img = $row['Img'];
-                    $customer->RegisteredAt = $row['RegisteredAt'];
-                    $customer->UpdateAt = $row['UpdateAt'];
-                    $customer->DateOfBirth = $row['DateOfBirth'];
-                    $customer->Password = $row['Password'];
-                    $customer->RandomKey = $row['RandomKey'];
-                    $customer->IsActive = $row['IsActive'];
-                    $customer->Role = $row['Role'];
-                }
-                $db->close();
-                return $customer;
-=======
             $customer = new Customer();
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
@@ -53,9 +31,7 @@ if (!class_exists('CustomerController')) {
                 $customer->RandomKey = $row['RandomKey'];
                 $customer->IsActive = $row['IsActive'];
                 $customer->Role = $row['Role'];
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
             }
-
             $db->close();
             return $customer;
         }
@@ -65,33 +41,18 @@ if (!class_exists('CustomerController')) {
             global $hostname, $username, $password, $dbname, $port;
             $db = new mysqli($hostname, $username, $password, $dbname, $port);
 
-<<<<<<< HEAD
-                $customer = new Customer();
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $customer->Id = $row['Id'];
-                    $customer->FirstName = $row['FirstName'];
-                    $customer->LastName = $row['LastName'];
-                    $customer->Address = $row['Address'];
-                    $customer->Phone = $row['Phone'];
-                    $customer->Email = $row['Email'];
-                    $customer->Img = $row['Img'];
-                    $customer->RegisteredAt = $row['RegisteredAt'];
-                    $customer->UpdateAt = $row['UpdateAt'];
-                    $customer->DateOfBirth = $row['DateOfBirth'];
-                    $customer->Password = $row['Password'];
-                    $customer->RandomKey = $row['RandomKey'];
-                    $customer->IsActive = $row['IsActive'];
-                    $customer->Role = $row['Role'];
-                }
-                $db->close();
-                return $customer;
-=======
-            $sql = "SELECT * FROM customer WHERE Id = " . (int)$id;
-            $result = $db->query($sql);
+            if ($db->connect_error) {
+                die("Connection failed: " . $db->connect_error);
+            }
 
             $customer = new Customer();
-            if ($result->num_rows > 0) {
+
+            // Thực hiện query
+            $id = $db->real_escape_string($id); // tránh SQL Injection
+            $sql = "SELECT * FROM Customers WHERE Id = '$id'";
+            $result = $db->query($sql);
+
+            if ($result && $result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $customer->Id = $row['Id'];
                 $customer->FirstName = $row['FirstName'];
@@ -107,43 +68,18 @@ if (!class_exists('CustomerController')) {
                 $customer->RandomKey = $row['RandomKey'];
                 $customer->IsActive = $row['IsActive'];
                 $customer->Role = $row['Role'];
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
             }
 
             $db->close();
             return $customer;
         }
 
-<<<<<<< HEAD
-            public function signUp($customer) {
-                global $hostname, $username, $password, $dbname, $port;
-                $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "INSERT INTO customer (FirstName, LastName, Address, Phone, Email, Img, RegisteredAt, DateOfBirth, Password, RandomKey, IsActive, Role)
-=======
-        public function checkDuplicateByEmail($customer)
-        {
-            global $hostname, $username, $password, $dbname, $port;
-            $db = new mysqli($hostname, $username, $password, $dbname, $port);
-            $sql = "SELECT * FROM customer WHERE Email = '" . $customer->Email . "'";
-            $result = $db->query($sql);
-            return $result->num_rows;
-        }
-
-        public function checkDuplicateByPhone($customer)
-        {
-            global $hostname, $username, $password, $dbname, $port;
-            $db = new mysqli($hostname, $username, $password, $dbname, $port);
-            $sql = "SELECT * FROM customer WHERE Phone = '" . $customer->Phone . "'";
-            $result = $db->query($sql);
-            return $result->num_rows;
-        }
 
         public function signUp($customer)
         {
             global $hostname, $username, $password, $dbname, $port;
             $db = new mysqli($hostname, $username, $password, $dbname, $port);
             $sql = "INSERT INTO customer (FirstName, LastName, Address, Phone, Email, Img, RegisteredAt, DateOfBirth, Password, RandomKey, IsActive, Role)
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
                         VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, 0)";
             $stmt = $db->prepare($sql);
             $stmt->bind_param(
@@ -176,55 +112,37 @@ if (!class_exists('CustomerController')) {
                             UpdateAt = NOW(),
                             DateOfBirth = ?
                         WHERE Id = ?";
-<<<<<<< HEAD
-                $stmt = $db->prepare($sql);
-                $stmt->bind_param("sssssdi",
-                    $customer->FirstName,
-                    $customer->LastName,
-                    $customer->Address,
-                    $customer->Phone,
-                    $customer->Img,
-                    $customer->DateOfBirth,
-                    $customer->Id
-                );
-                $result = $stmt->execute();
-                return $result && ($stmt->affected_rows > 0);
-            }
-
-            public function changePassword($customer) {
-                global $hostname, $username, $password, $dbname, $port;
-                $db = new mysqli($hostname, $username, $password, $dbname, $port);
-                $sql = "UPDATE customer SET 
-                            Password = ?,
-                            UpdateAt = NOW()
-                        WHERE Id = ?";
-                $stmt = $db->prepare($sql);
-                $stmt->bind_param("si",
-                    $customer->Password,
-                    $customer->Id
-                );
-                $result = $stmt->execute();
-                return $result && ($stmt->affected_rows > 0);
-            }
-=======
             $stmt = $db->prepare($sql);
             $stmt->bind_param(
-                "ssssssssssi",
+                "sssssdi",
                 $customer->FirstName,
                 $customer->LastName,
                 $customer->Address,
                 $customer->Phone,
-                $customer->Email,
                 $customer->Img,
                 $customer->DateOfBirth,
-                $customer->Password,
-                $customer->RandomKey,
-                $customer->IsActive,
                 $customer->Id
             );
             $result = $stmt->execute();
             return $result && ($stmt->affected_rows > 0);
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
+        }
+
+        public function changePassword($customer)
+        {
+            global $hostname, $username, $password, $dbname, $port;
+            $db = new mysqli($hostname, $username, $password, $dbname, $port);
+            $sql = "UPDATE customer SET 
+                            Password = ?,
+                            UpdateAt = NOW()
+                        WHERE Id = ?";
+            $stmt = $db->prepare($sql);
+            $stmt->bind_param(
+                "si",
+                $customer->Password,
+                $customer->Id
+            );
+            $result = $stmt->execute();
+            return $result && ($stmt->affected_rows > 0);
         }
     }
 }

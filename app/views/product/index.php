@@ -1,16 +1,10 @@
 <?php
-<<<<<<< HEAD
 session_start();
 $selectedStore = $_SESSION['SelectedStore'] ?? 0;
-=======
-// session_start();
-require_once '../header.php';
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
 
 require_once '../../controllers/ProductController.php';
 require_once '../../controllers/CategoryController.php';
 require_once '../../controllers/StoreController.php';
-<<<<<<< HEAD
 require_once '../../controllers/CartController.php';
 
 $successMessage = $_SESSION['success_message'] ?? '';
@@ -24,25 +18,6 @@ $categories = $categoryController->getAllCategories();
 
 $storeController = new StoreController();
 $stores = $storeController->getAllStores();
-=======
-
-$categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
-$storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
-$limits = 5;
-
-$categoryController = new CategoryController();
-$categories = $categoryController->getAllCategories();
-
-$storeController = new StoreController();
-$stores = $storeController->getAllStores();
-
-$productController = new ProductController();
-$products = $productController->getAllProducts($storeId, $categoryId);
-$featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
-$latestProducts = $productController->getLatestProducts($storeId, $limits);
-
-$customerId = $_SESSION['CustomerId'] ?? 0;
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
 
 $productController = new ProductController();
 
@@ -317,10 +292,6 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
             display: -webkit-box;
             -webkit-line-clamp: 3;
             line-clamp: 3;
-<<<<<<< HEAD
-=======
-            /* Standard property for compatibility */
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
             -webkit-box-orient: vertical;
             overflow: hidden;
             margin-bottom: 15px;
@@ -656,12 +627,9 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
 </head>
 
 <body>
-<<<<<<< HEAD
     <div id="topToastContainer" style="position: fixed; top: 0; left: 50%; transform: translateX(-50%); z-index: 9999; width: auto;"></div>
 
     <?php include '../header.php'; ?>
-=======
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
 
     <div class="container-fluid page-header">
         <h1 class="display-6 fw-bold font-monospace">Trung Nguyên Cà Phê</h1>
@@ -675,7 +643,6 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
     </div>
 
     <div class="branch-select-box">
-<<<<<<< HEAD
         <?php if (!empty($successMessage)): ?>
             <div class="alert alert-success"><?= $successMessage ?></div>
         <?php endif; ?>
@@ -696,34 +663,12 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
                 <?php endforeach; ?>
             </div>
         </div>
-=======
-        <label for="branchSelect">Chọn chi nhánh:</label>
-        <form method="get" action="" id="branchForm">
-            <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
-                <option value="">-- Chọn chi nhánh --</option>
-                <?php if (!empty($stores)): ?>
-                    <?php foreach ($stores as $store): ?>
-                        <?php
-                        $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
-                        $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
-                        $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
-                        ?>
-                        <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
-                        </option>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </select>
-            <input type="hidden" name="category" value="<?php echo $categoryId; ?>">
-        </form>
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
     </div>
 
     <div class="container" style="display:none;" id="productsContainer">
         <aside class="sidebar">
             <div class="sidebar-section">
                 <h3>Danh mục</h3>
-<<<<<<< HEAD
                 <ul id="categoryList">
                     <li><a href="#" data-id="0">Tất cả danh mục</a></li>
                     <?php foreach ($categories as $cat):
@@ -734,107 +679,6 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
                     <?php endforeach; ?>
                 </ul>
             </div>
-=======
-                <ul>
-                    <?php if (!empty($categories)): ?>
-                        <li><a href="index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
-                        <?php foreach ($categories as $cat): ?>
-                            <?php
-                            $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                            $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
-                            ?>
-                            <li>
-                                <a href="index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
-                                    <?php echo $categoryId == $c_Id ? 'style="color: #ffb300; font-weight: bold;"' : ''; ?>>
-                                    <?php echo htmlspecialchars($c_Title); ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <li><span>Không có danh mục</span></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm nổi bật</h3>
-                <?php if (!empty($featuredProducts)): ?>
-                    <?php foreach ($featuredProducts as $product): ?>
-                        <?php
-                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                        ?>
-                        <div class="featured-product">
-                            <a href="detail.php">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
-                                <?php endif; ?>
-                                <?php
-                                $_SESSION['currentProductId'] = $p_Id;
-                                $_SESSION['currertStoreId'] = $storeId;
-                                ?>
-                            </a>
-                            <div>
-                                <h4><?php echo htmlspecialchars($p_Title); ?></h4>
-                                <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p style="color: #999;">Không có sản phẩm nổi bật</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm mới</h3>
-                <?php if (!empty($latestProducts)): ?>
-                    <?php foreach ($latestProducts as $product): ?>
-                        <?php
-                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                        ?>
-                        <div class="featured-product">
-                            <a href="detail.php">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                                <?php endif; ?>
-                                <?php
-                                $_SESSION['currentProductId'] = $p_Id;
-                                ?>
-                            </a>
-                            <div>
-                                <h4><?php echo htmlspecialchars($p_Title); ?></h4>
-                                <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p style="color: #999;">Không có sản phẩm nổi bật</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm bán chạy</h3>
-                <!-- Lọc dựa trên số lượng bán -->
-
-                <!-- <div class="featured-product">
-                    <img src="Images/SanPham/sample.jpg" alt="Sản phẩm bán chạy">
-                    <div>
-                        <h4>Latte</h4>
-                        <p>30.000 VND</p>
-                    </div>
-                </div> -->
-                <!-- Thêm nhiều hơn nếu cần -->
-            </div>
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
         </aside>
 
         <main class="main-content">
@@ -850,48 +694,8 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
                     <option value="latest_desc">Sản phẩm mới nhất</option>
                 </select>
             </div>
-<<<<<<< HEAD
             <div class="products-grid" id="productsGrid">
                 <!-- Sản phẩm sẽ load bằng JS -->
-=======
-
-            <div class="products-grid">
-                <?php if (!empty($products)): ?>
-                    <?php foreach ($products as $product): ?>
-                        <?php
-                        $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                        $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                        $p_Content = is_object($product) ? $product->Content : (isset($product['Content']) ? $product['Content'] : '');
-                        $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                        $p_Rate = is_object($product) ? $product->Rate : (isset($product['Rate']) ? $product['Rate'] : 0);
-                        $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                        $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
-                        ?>
-                        <div class="card">
-                            <a href="detail.php">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                                <?php endif; ?>
-                                <?php
-                                $_SESSION['currentProductId'] = $p_Id;
-                                ?>
-                            </a>
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($p_Title); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars(substr($p_Content, 0, 100)); ?></p>
-                                <span class="price"><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</span>
-                                <button class="btn"><i class="fa fa-shopping-bag me-2"></i>Thêm vào giỏ</button>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                        <p>Không tìm thấy sản phẩm nào</p>
-                    </div>
-                <?php endif; ?>
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
             </div>
         </main>
     </div>

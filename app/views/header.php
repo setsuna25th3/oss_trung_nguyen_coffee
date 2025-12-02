@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
 $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
 
@@ -10,12 +9,6 @@ if ($customerId) {
 } else {
     $totalCartItems = 0;
 }
-=======
-session_start();
-
-$customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
-$customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
->>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
