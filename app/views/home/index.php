@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang chủ - Trung Nguyên Cà Phê</title>
+    <title> Trang chủ - Trung Nguyên Cà Phê</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -13,11 +13,9 @@
         body {
             background-color: #fff1e0;
             padding-top: 150px;
-            /* tránh bị header che */
             font-family: 'Segoe UI', sans-serif;
         }
 
-        /* HERO */
         .hero {
             text-align: center;
             padding: 90px 20px 10px;
@@ -47,7 +45,6 @@
             line-height: 1.8;
         }
 
-        /* SLIDER */
         .banner-slider {
             max-width: 1200px;
             height: 600px;
@@ -121,6 +118,10 @@
 </head>
 
 <body>
+<<<<<<< HEAD
+=======
+
+>>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
     <?php include "../header.php"; ?>
 
     <section class="hero">
@@ -137,7 +138,6 @@
         </p>
     </section>
 
-    <!-- SLIDER -->
     <div class="banner-slider">
         <button class="prev">&#10094;</button>
         <button class="next">&#10095;</button>
@@ -210,7 +210,7 @@
         }
     </script>
 
-    <!-- FOOTER -->
+
     <?php include "../footer.php"; ?>
 
 </body>

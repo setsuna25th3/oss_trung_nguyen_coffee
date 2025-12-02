@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php
 require_once __DIR__ . '/../../controllers/ProductAdminController.php';
 
@@ -5,6 +6,8 @@ require_once __DIR__ . '/../../controllers/ProductAdminController.php';
 $productAdminController = new ProductAdminController();
 $productAdmins = $productAdminController->getAllProducts(0);
 ?>
+=======
+>>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -111,6 +114,7 @@ $productAdmins = $productAdminController->getAllProducts(0);
                         </tr>
                     </thead>
                     <tbody>
+<<<<<<< HEAD
                         <?php foreach ($productAdmins as $product): ?>
                             <tr>
                                 <td><?php echo $product->Id; ?></td>
@@ -135,6 +139,27 @@ $productAdmins = $productAdminController->getAllProducts(0);
                                 </td>
                             </tr>
                         <?php endforeach; ?>
+=======
+                        <!-- Demo row -->
+                        <tr>
+                            <td>1</td>
+                            <td>Cà phê Arabica</td>
+                            <td><span class="content-clamp">Mô tả ngắn sản phẩm cà phê Arabica chất lượng cao...</span></td>
+                            <td><img src="https://via.placeholder.com/100x60" alt="Hình sản phẩm"></td>
+                            <td>100,000 VND</td>
+                            <td>4.5</td>
+                            <td>2024-01-01</td>
+                            <td>2024-01-05</td>
+                            <td>1</td>
+                            <td>Cà phê rang</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
+                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
+                            </td>
+                        </tr>
+                        <!-- Thêm các row demo khác nếu muốn -->
+>>>>>>> b9bcb9dc38cb50174a7b7d38d26ab720d6931076
                     </tbody>
                 </table>
             </div>
