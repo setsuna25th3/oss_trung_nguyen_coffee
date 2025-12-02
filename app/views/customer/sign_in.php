@@ -1,50 +1,48 @@
 <?php
-    session_start();
-    $signUpSuccessMessage = $_SESSION['SignUpSuccessMessage'] ?? '';
-    unset($_SESSION['SignUpSuccessMessage']);
-    include '../../models/Customer.php';
-    include '../../controllers/CustomerController.php';
+session_start();
+$signUpSuccessMessage = $_SESSION['SignUpSuccessMessage'] ?? '';
+unset($_SESSION['SignUpSuccessMessage']);
+include '../../models/Customer.php';
+include '../../controllers/CustomerController.php';
 
 
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
-    $errors = [];
+$email = $_POST['email'] ?? '';
+$password = $_POST['password'] ?? '';
+$errors = [];
 
-    function printVar($var){
-        if (isset($var)) echo $var;
-    }
+function printVar($var)
+{
+    if (isset($var)) echo $var;
+}
 
-    if (isset($_POST['SignIn'])) {
+if (isset($_POST['SignIn'])) {
 
-        $customerController = new CustomerController();
-        $customer = $customerController->getCustomerByEmail($email);
+    $customerController = new CustomerController();
+    $customer = $customerController->getCustomerByEmail($email);
 
-        if (!$customer) {
-            $errors[] = 'Không tìm thấy tài khoản với email này.';
-        } else if (!password_verify($password, $customer->Password)) {
-            $errors[] = 'Mật khẩu không đúng.';
-        }
-        else {
-            if (!$customer->IsActive){
-                $_SESSION['temp_error'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
-                header('Location: access_denied.php');
+    if (!$customer) {
+        $errors[] = 'Không tìm thấy tài khoản với email này.';
+    } else if (!password_verify($password, $customer->Password)) {
+        $errors[] = 'Mật khẩu không đúng.';
+    } else {
+        if (!$customer->IsActive) {
+            $_SESSION['temp_error'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
+            header('Location: access_denied.php');
+            exit();
+        } else {
+            $_SESSION['CustomerId'] = $customer->Id;
+            $_SESSION['CustomerName'] = $customer->LastName . ' ' . $customer->FirstName;
+
+            if ($customer->Role) {
+                header('Location: ../../admin/views/index.php');
+                exit();
+            } else {
+                header('Location: ../home/index.php');
                 exit();
             }
-            else{
-                $_SESSION['CustomerId'] = $customer->Id;
-                $_SESSION['CustomerName'] = $customer->LastName . ' ' . $customer->FirstName;
-
-                if ($customer->Role){
-                    header('Location: ../../admin/views/index.php');
-                    exit();
-                }
-                else{
-                    header('Location: ../home/index.php');
-                    exit();
-                }
-            }
         }
     }
+}
 ?>
 
 <?php include '../header.php'; ?>
@@ -242,7 +240,7 @@
             <table>
                 <tr>
                     <td><label for="email">Email</label></td>
-                    <td><input type="email" name="email" id="email" class="form-control" required value="<?php printVar($email)?>"></td>
+                    <td><input type="email" name="email" id="email" class="form-control" required value="<?php printVar($email) ?>"></td>
                 </tr>
                 <tr>
                     <td><label for="password">Mật khẩu</label></td>

@@ -1,24 +1,35 @@
 <?php
-    session_start();
-    require_once __DIR__ .'/../../controllers/CategoryController.php';
-    require_once __DIR__ .'/../../controllers/CartController.php';
-    require_once __DIR__ .'/../../controllers/ProductController.php';
-    require_once __DIR__ .'/../../controllers/StoreController.php';
+session_start();
+// require_once __DIR__ .'/../../controllers/CategoryController.php';
+require_once __DIR__ . '/../../controllers/CartController.php';
+require_once __DIR__ . '/../../controllers/ProductController.php';
+require_once __DIR__ . '/../../controllers/StoreController.php';
 
-    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : 0;
-    $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
-    $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
-    $total = 0;
-    $_SESSION['storeId'] = $storeId;
+$customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : 0;
+$total = 0;
 
-    $categoryController = new CategoryController();
-    $cartController = new CartController();
-    $productController = new ProductController();
-    $storeController = new StoreController();
+// $categoryController = new CategoryController();
+$cartController = new CartController();
+$productController = new ProductController();
+$storeController = new StoreController();
 
-    $categories = $categoryController->getAllCategories();
-    $carts = $cartController->getCartByCustomerId($customerId, $storeId);
-    $stores = $storeController->getAllStores();
+// $categories = $categoryController->getAllCategories();
+$carts = $cartController->getCartByCustomerId($customerId, 0); // Giả sử 0 trả về tất cả chi nhánh
+$stores = $storeController->getAllStores();
+
+// Nhóm giỏ hàng theo chi nhánh
+$groupedCarts = [];
+foreach ($carts as $cart) {
+    $groupedCarts[$cart->StoreId][] = $cart;
+}
+
+// Map tên chi nhánh
+$storeMap = [];
+foreach ($stores as $store) {
+    $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
+    $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
+    $storeMap[$s_Id] = $s_Name;
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -111,13 +122,8 @@
             gap: 30px;
         }
 
-        .sidebar {
-            width: 25%;
-            min-width: 250px;
-        }
-
         .main-content {
-            width: 75%;
+            width: 100%;
         }
 
         .sidebar-section {
@@ -248,121 +254,261 @@
             color: #ffb300;
             font-weight: 700;
         }
+
+        .store-section {
+            margin-bottom: 40px;
+        }
+
+        .store-section h2 {
+            font-size: 24px;
+            color: #37474f;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart {
+            text-align: center;
+            font-size: 18px;
+            color: #37474f;
+            margin-top: 20px;
+        }
+
+        .quantity-input {
+            width: 70px;
+            padding: 6px 10px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
+            border: 2px solid #ffb300;
+            border-radius: 25px;
+            outline: none;
+            transition: all 0.3s;
+            color: #37474f;
+            background-color: #fff;
+
+        }
+
+        /* .quantity-input::-webkit-outer-spin-button,
+        .quantity-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        } */
+
+        .quantity-input:focus {
+            border-color: #ff9800;
+            box-shadow: 0 0 5px rgba(255, 152, 0, 0.5);
+        }
     </style>
 </head>
 
 <body>
     <?php include '../header.php'; ?>
-    
+
     <div class="container-fluid page-header">
         <h1>Giỏ hàng</h1>
         <ul class="breadcrumb">
             <li><a href="../home/index.php">Trang chủ</a></li><span class="separator">/</span>
             <li><a href="../contact/index.php">Liên hệ</a></li><span class="separator">/</span>
-            <li class="active">Cửa hàng</li>
+            <li class="active">Giỏ hàng</li>
         </ul>
     </div>
 
     <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <h3>Danh mục</h3>
-                <ul>
-                    <?php if (!empty($categories)): ?>
-                        <li><a href="../product/index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
-                        <?php foreach ($categories as $cat): ?>
-                            <?php
-                                $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                                $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
-                            ?>
-                            <li>
-                                <a href="../product/index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
-                                    <?php echo $categoryId == $c_Id ? 'style="color: #ffb300; font-weight: bold;"' : ''; ?>>
-                                    <?php echo htmlspecialchars($c_Title); ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <li><span>Không có danh mục</span></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </aside>
-
         <main class="main-content">
-            <form method="get" action="" id="branchForm">
-                <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
-                    <option value="">-- Chọn chi nhánh --</option>
-                        <?php if (!empty($stores)): ?>
-                            <?php foreach ($stores as $store): ?>
-                                <?php
-                                    $s_Id = is_object($store) ? $store->Id : (isset($store['Id']) ? $store['Id'] : 0);
-                                    $s_Name = is_object($store) ? $store->StoreName : (isset($store['StoreName']) ? $store['StoreName'] : '');
-                                    $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
-                                ?>
-                                <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        <?php endif; ?>
-                </select>
-            </form>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Ảnh sản phẩm</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Tổng tiền</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php $total =  0; ?>
-                    <?php foreach ($carts as $cart): ?>
-                        <tr>
-                            <?php
-                                $product = $productController->getProductById($cart->ProductId);
-                            ?>
-                            <td>
-                                <img src="../../img/SanPham/<?php echo htmlspecialchars($product->Img) ?>" class="product-img" alt="Sản phẩm">
-                            </td>
-                            <td><?php echo htmlspecialchars($product->Title) ?></td>
-                            <td><?php echo number_format($product->Price, 0, ',', '.') ?> VNĐ</td>
-                            <td><?php echo htmlspecialchars($cart->Quantity) ?></td>
-                            <?php 
-                                $itemTotal = $product->Price * $cart->Quantity;
-                                $total += $itemTotal;
-                            ?>
-                            <td><?php echo number_format($itemTotal, 0, ',', '.') ?> VNĐ</td>
-                            <td>
-                                <?php if ($storeId): ?>
-                                    <form method="post" action="remove_product.php">
-                                        <input type="hidden" name="customerId" value="<?php echo $cart->CustomerId; ?>">
-                                        <input type="hidden" name="productId" value="<?php echo $product->Id; ?>">
-                                        <input type="hidden" name="storeId" value="<?php echo $cart->StoreId; ?>">
-                                        <button type="submit" class="btn">Xóa</button>
-                                    </form>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+            <?php if (empty($carts)): ?>
+                <p class="empty-cart">Giỏ hàng của bạn đang trống.</p>
+            <?php else: ?>
+                <?php foreach ($groupedCarts as $storeId => $storeCarts): ?>
+                    <?php if (!empty($storeCarts)): ?>
+                        <div class="store-section" data-store-id="<?php echo $storeId; ?>">
+                            <h2><?php echo htmlspecialchars($storeMap[$storeId] ?? 'Chi nhánh không xác định'); ?></h2>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Chọn</th>
+                                        <th>Ảnh sản phẩm</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng</th>
+                                        <th>Tổng tiền</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $storeTotal = 0; ?>
+                                    <?php foreach ($storeCarts as $cart): ?>
+                                        <?php
+                                        $product = $productController->getProductById($cart->ProductId);
+                                        $itemTotal = $product->Price * $cart->Quantity;
+                                        $storeTotal += $itemTotal;
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" class="product-checkbox" value="<?php echo $product->Id; ?>" data-item-total="<?php echo $itemTotal; ?>" checked>
+                                            </td>
+                                            <td>
+                                                <img src="../../img/SanPham/<?php echo htmlspecialchars($product->Img) ?>" class="product-img" alt="Sản phẩm">
+                                            </td>
+                                            <td><?php echo htmlspecialchars($product->Title) ?></td>
+                                            <td><?php echo number_format($product->Price, 0, ',', '.') ?> VNĐ</td>
 
-            <div class="checkout-box">
-                <h4>Tổng tiền:</h4>
-                <p><?php echo number_format($total, 0, ',', '.'); ?> VNĐ</p>
-                <?php if ($storeId > 0 && $total > 0): ?>
-                    <button class="btn">Thanh toán</button>
-                <?php endif; ?>
-                <!-- xử lý thanh toán -->
-            </div>
+                                            <td>
+                                                <input type="number" class="quantity-input"
+                                                    data-product-id="<?php echo $product->Id; ?>"
+                                                    data-store-id="<?php echo $cart->StoreId; ?>"
+                                                    value="<?php echo $cart->Quantity; ?>"
+                                                    min="1" style="width:60px; text-align:center;">
+                                            </td>
+                                            <td class="item-total"><?php echo number_format($itemTotal, 0, ',', '.'); ?> VNĐ</td>
+                                            <td>
+                                                <button type="button" class="btn remove-btn"
+                                                    data-product-id="<?php echo $product->Id; ?>"
+                                                    data-store-id="<?php echo $cart->StoreId; ?>">
+                                                    Xóa
+                                                </button>
+                                            </td>
+
+
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    <tr>
+                                        <td colspan="7">
+                                            <form style="text-align: right;" method="post" action="checkout_process.php" class="cartForm">
+
+                                                <p class="totalAmount" style="font-weight: bold;"><?php echo 'Tổng tiền: ' . number_format($storeTotal, 0, ',', '.'); ?> VNĐ</p>
+                                                <button type="submit" class="btn checkoutBtn" <?php echo $storeTotal <= 0 ? 'disabled' : ''; ?>>Thanh toán</button>
+                                                <input type="hidden" name="storeId" value="<?php echo $storeId; ?>">
+                                                <input type="hidden" name="customerId" value="<?php echo $customerId; ?>">
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+
+                        </div>
+
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </main>
     </div>
 
     <?php include '../footer.php'; ?>
+
+    <script>
+        function updateHeaderCart() {
+            let totalQty = 0;
+            // Duyệt tất cả sản phẩm trong giỏ
+            document.querySelectorAll('.store-section tbody tr').forEach(row => {
+                const checkbox = row.querySelector('.product-checkbox');
+                if (checkbox && checkbox.checked) { // nếu muốn tính theo sản phẩm được chọn
+                    const qty = parseInt(row.querySelector('.quantity-input').value);
+                    totalQty += qty;
+                }
+            });
+
+            // Cập nhật số lượng lên header
+            const cartCount = document.getElementById('cartCount');
+            if (cartCount) cartCount.textContent = totalQty;
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+
+            function updateStoreTotal(storeId) {
+                const section = document.querySelector(`.store-section[data-store-id='${storeId}']`);
+                if (!section) return;
+
+                let total = 0;
+                section.querySelectorAll('tbody tr').forEach(row => {
+                    const checkbox = row.querySelector('.product-checkbox');
+                    const itemTotalCell = row.querySelector('.item-total');
+                    if (checkbox && checkbox.checked && itemTotalCell) {
+                        total += parseInt(itemTotalCell.textContent.replace(/\D/g, ''));
+                    }
+                });
+
+                const totalAmountElement = section.querySelector('.totalAmount');
+                if (totalAmountElement) totalAmountElement.textContent = total.toLocaleString('vi-VN') + ' VNĐ';
+
+                const checkoutBtn = section.querySelector('.checkoutBtn');
+                if (checkoutBtn) checkoutBtn.disabled = total <= 0;
+            }
+
+            // Khi tick checkbox, cập nhật tổng tiền
+            document.querySelectorAll('.product-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const storeId = this.closest('.store-section').dataset.storeId;
+                    updateStoreTotal(storeId);
+                    updateHeaderCart();
+
+                });
+            });
+
+            // Thay đổi số lượng
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    let quantity = parseInt(this.value);
+                    if (quantity < 1) quantity = 1;
+                    this.value = quantity;
+
+                    const row = this.closest('tr');
+                    const storeId = row.closest('.store-section').dataset.storeId;
+                    const price = parseInt(row.querySelector('td:nth-child(4)').textContent.replace(/\D/g, ''));
+                    const newTotal = price * quantity;
+
+                    // Cập nhật item-total
+                    row.querySelector('.item-total').textContent = newTotal.toLocaleString('vi-VN') + ' VNĐ';
+                    // Cập nhật data-item-total của checkbox
+                    const checkbox = row.querySelector('.product-checkbox');
+                    if (checkbox) checkbox.setAttribute('data-item-total', newTotal);
+
+                    updateStoreTotal(storeId);
+                    updateHeaderCart();
+                });
+            });
+
+            // Xóa sản phẩm
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const row = this.closest('tr');
+                    const storeId = row.closest('.store-section').dataset.storeId;
+                    const productId = this.dataset.productId;
+
+                    if (!confirm('Bạn có chắc muốn xóa sản phẩm này?')) return;
+
+                    fetch('ajax_cart.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams({
+                                action: 'remove',
+                                productId,
+                                storeId
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                const section = row.closest('.store-section');
+                                row.remove();
+
+                                const tbody = section.querySelector('tbody');
+                                if (!tbody.querySelector('tr')) {
+                                    section.remove();
+                                } else {
+                                    updateStoreTotal(storeId);
+                                }
+
+                                updateHeaderCart();
+                            }
+
+                        });
+                });
+            });
+
+        });
+    </script>
+
 </body>
 
 </html>

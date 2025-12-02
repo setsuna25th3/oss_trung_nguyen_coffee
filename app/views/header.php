@@ -1,14 +1,14 @@
 <?php
-    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
-    $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
+$customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
+$customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
 
-    if ($customerId) {
-        require_once '../../controllers/CartController.php'; 
-        $cartController = new CartController();
-        $totalCartItems = $cartController->getTotal($customerId);
-    } else {
-        $totalCartItems = 0;
-    }
+if ($customerId) {
+    require_once '../../controllers/CartController.php';
+    $cartController = new CartController();
+    $totalCartItems = $cartController->getTotal($customerId);
+} else {
+    $totalCartItems = 0;
+}
 ?>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -259,23 +259,23 @@
 
                 <ul class="dropdown-list">
                     <?php
-                        include '../../controllers/CategoryController.php';
-                        $categoryController = new CategoryController();
-                        $categories = $categoryController->getAllCategories();
+                    include '../../controllers/CategoryController.php';
+                    $categoryController = new CategoryController();
+                    $categories = $categoryController->getAllCategories();
                     ?>
                     <?php if (!empty($categories)): ?>
                         <?php foreach ($categories as $cat): ?>
                             <?php
-                                $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                                $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
+                            $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
+                            $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
                             ?>
                             <li><a href="../product/index.php?category=<?php echo $c_Id; ?>">
-                                <?php echo htmlspecialchars($c_Title); ?>
-                            </a></li>
+                                    <?php echo htmlspecialchars($c_Title); ?>
+                                </a></li>
                         <?php endforeach; ?>
-                        <?php else: ?>
-                            <span class="dropdown-item disabled">Không có loại sản phẩm</span>
-                        <?php endif; ?>
+                    <?php else: ?>
+                        <span class="dropdown-item disabled">Không có loại sản phẩm</span>
+                    <?php endif; ?>
                 </ul>
             </div>
 
@@ -285,8 +285,9 @@
         <div class="menu-icons">
             <a href="../contact/index.php"><i class="fas fa-phone-alt"></i></a>
             <a href="../cart/index.php" class="cart">
-                <i class="fas fa-shopping-cart"></i><sup><?php echo $totalCartItems; ?></sup>
+                <i class="fas fa-shopping-cart"></i><sup id="cartCount"><?php echo $totalCartItems; ?></sup>
             </a>
+
             <a href="../customer/profile.php"><i class="fas fa-user"></i></a>
         </div>
 
