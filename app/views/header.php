@@ -1,11 +1,16 @@
 <?php
     $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
     $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
+    $role = 0;
 
     if ($customerId) {
-        require_once '../../controllers/CartController.php'; 
+        require_once '../../controllers/CartController.php';
+        require_once '../../controllers/CustomerController.php';
+
         $cartController = new CartController();
+        $customerController = new CustomerController();
         $totalCartItems = $cartController->getTotal($customerId);
+        $role = $customerController->getCustomerById($customerId)->Role;
     } else {
         $totalCartItems = 0;
     }
@@ -280,14 +285,31 @@
             </div>
 
             <a href="../contact/index.php">Liên hệ</a>
+            <?php if($role): ?>
+                <a href="../../admin/views/index.php">Trang quản trị</a>
+            <?php endif; ?>
         </div>
 
         <div class="menu-icons">
             <a href="../contact/index.php"><i class="fas fa-phone-alt"></i></a>
-            <a href="../cart/index.php" class="cart">
-                <i class="fas fa-shopping-cart"></i><sup><?php echo $totalCartItems; ?></sup>
-            </a>
-            <a href="../customer/profile.php"><i class="fas fa-user"></i></a>
+            <?php if($customerId): ?>
+                <a href="../cart/index.php" class="cart">
+                    <i class="fas fa-shopping-cart"></i><sup><?php echo $totalCartItems; ?></sup>
+                </a>
+            <?php else: ?>
+                <a href="../customer/sign_in.php" class="cart">
+                    <i class="fas fa-shopping-cart"></i><sup><?php echo $totalCartItems; ?></sup>
+                </a>
+            <?php endif; ?>
+            <?php if($customerId): ?>
+                <a href="../customer/profile.php">
+                    <i class="fas fa-user"></i>
+                </a>
+            <?php else: ?>
+                <a href="../customer/sign_in.php">
+                    <i class="fas fa-user"></i>
+                </a>
+            <?php endif; ?>
         </div>
 
     </div>

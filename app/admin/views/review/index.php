@@ -72,11 +72,6 @@
                     </select>
                     <button class="btn btn-primary">Lọc</button>
                 </div>
-                <div>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
-                        <i class="fa fa-plus"></i> Thêm đánh giá
-                    </button>
-                </div>
             </div>
 
             <div class="table-responsive">
@@ -102,9 +97,6 @@
                             <td>Rất thơm và ngon!</td>
                             <td>2025-12-01 08:00</td>
                             <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
                                 <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                     <i class="fa fa-trash"></i>Xóa
                                 </button>
@@ -118,9 +110,6 @@
                             <td>Hương vị đậm đà, vừa miệng.</td>
                             <td>2025-12-01 09:15</td>
                             <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
                                 <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
                                     <i class="fa fa-trash"></i>Xóa
                                 </button>
@@ -140,82 +129,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <form class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm đánh giá mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Sản phẩm</label>
-                        <select class="form-select">
-                            <option selected>Chọn sản phẩm</option>
-                            <option value="1">Cà phê Arabica</option>
-                            <option value="2">Cà phê Robusta</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Khách hàng</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên khách hàng">
-                    </div>
-                    <div class="mb-3">
-                        <label>Đánh giá (1-5)</label>
-                        <input type="number" class="form-control" min="1" max="5" placeholder="Nhập số sao">
-                    </div>
-                    <div class="mb-3">
-                        <label>Bình luận</label>
-                        <textarea class="form-control" placeholder="Nhập bình luận"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success">Thêm</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <form class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sửa đánh giá</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Sản phẩm</label>
-                        <select class="form-select">
-                            <option selected>Cà phê Arabica</option>
-                            <option value="2">Cà phê Robusta</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Khách hàng</label>
-                        <input type="text" class="form-control" value="Nguyễn Văn A">
-                    </div>
-                    <div class="mb-3">
-                        <label>Đánh giá (1-5)</label>
-                        <input type="number" class="form-control" min="1" max="5" value="5">
-                    </div>
-                    <div class="mb-3">
-                        <label>Bình luận</label>
-                        <textarea class="form-control">Rất thơm và ngon!</textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-warning">Lưu</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">

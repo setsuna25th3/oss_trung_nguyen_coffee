@@ -1,3 +1,9 @@
+<?php
+    require_once __DIR__ . '/../../controllers/ProductAdminController.php';
+
+    $productAdminController = new ProductAdminController();
+    $productAdmins = $productAdminController->getAllProducts(0);
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -104,25 +110,29 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Demo row -->
-                        <tr>
-                            <td>1</td>
-                            <td>Cà phê Arabica</td>
-                            <td><span class="content-clamp">Mô tả ngắn sản phẩm cà phê Arabica chất lượng cao...</span></td>
-                            <td><img src="https://via.placeholder.com/100x60" alt="Hình sản phẩm"></td>
-                            <td>100,000 VND</td>
-                            <td>4.5</td>
-                            <td>2024-01-01</td>
-                            <td>2024-01-05</td>
-                            <td>1</td>
-                            <td>Cà phê rang</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
-                        <!-- Thêm các row demo khác nếu muốn -->
+                        <?php foreach($productAdmins as $product): ?>
+                            <tr>
+                                <td><?php echo $product->Id; ?></td>
+                                <td><?php echo $product->Title; ?></td>
+                                <td>
+                                    <span class="content-clamp"><?php echo $product->Content; ?></span>
+                                </td>
+                                <td>
+                                    <img src="/oss_trung_nguyen_coffee/app/img/SanPham/<?php echo $product->Img; ?>" alt="<?php echo $product->Title; ?>">
+                                </td>
+                                <td><?php echo number_format($product->Price, 0, ",", "."); ?></td>
+                                <td><?php echo $product->Rate; ?></td>
+                                <td><?php echo $product->CreateAt; ?></td>
+                                <td><?php echo $product->UpdateAt; ?></td>
+                                <td><?php echo $product->CategoryId; ?></td>
+                                <td><?php echo $product->CategoryTitle; ?></td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i></button>
+                                    <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i></button>
+                                    <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

@@ -24,11 +24,24 @@
     $stores = $storeController->getAllStores();
 
     $productController = new ProductController();
-    $products = $productController->getAllProducts($storeId, $categoryId, $sort, $searchString);
     $featuredProducts = $productController->getFeaturedProducts($storeId, $limits);
     $latestProducts = $productController->getLatestProducts($storeId, $limits);
 
+    $rowsPerPage = 6;
+    $currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+    $offset = ($currentPage - 1) * $rowsPerPage;
+    $products = $productController->getAllProducts($storeId, $categoryId, $sort, $searchString, $offset, $rowsPerPage);
+    $numRows = count($productController->countAllProducts($storeId, $categoryId, $sort, $searchString));
+    $maxPage = ceil($numRows/$rowsPerPage);
+
     $customerId = $_SESSION['CustomerId'] ?? 0;
+
+    $basePaginationUrl = $_SERVER['PHP_SELF'] . '?' . http_build_query([
+            'store' => $storeId,
+            'category' => $categoryId,
+            'searchString' => $searchString,
+            'sort' => $sort,
+        ]);
 ?>
 
 <!DOCTYPE html>
@@ -457,13 +470,6 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
-
-            <?php if (!empty($errorMessage)): ?>
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <?= $errorMessage ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            <?php endif; ?>
         </div>
         <label for="branchSelect">Chọn chi nhánh:</label>
         <form method="get" action="" id="branchForm">
@@ -477,7 +483,7 @@
                                 $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
                             ?>
                             <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
+                                <?php echo htmlspecialchars($s_Name); ?>
                             </option>
                         <?php endforeach; ?>
                     <?php endif; ?>
@@ -488,186 +494,211 @@
         </form>
     </div>
 
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <h3>Danh mục</h3>
-                <ul>
-                    <?php if (!empty($categories)): ?>
-                        <li><a href="index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
-                        <?php foreach ($categories as $cat): ?>
+    <?php if($storeId): ?>
+        <div class="container">
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3>Danh mục</h3>
+                    <ul>
+                        <?php if (!empty($categories)): ?>
+                            <li><a href="index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
+                            <?php foreach ($categories as $cat): ?>
+                                <?php
+                                    $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
+                                    $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
+                                ?>
+                                <li>
+                                    <a href="index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
+                                        <?php echo $categoryId == $c_Id ? 'style="color: #ffb300; font-weight: bold;"' : ''; ?>>
+                                        <?php echo htmlspecialchars($c_Title); ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <li><span>Không có danh mục</span></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Sản phẩm nổi bật</h3>
+                    <?php if (!empty($featuredProducts)): ?>
+                        <?php foreach ($featuredProducts as $product): ?>
                             <?php
-                                $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                                $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
+                                $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                                $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                                $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                                $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
                             ?>
-                            <li>
-                                <a href="index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
-                                    <?php echo $categoryId == $c_Id ? 'style="color: #ffb300; font-weight: bold;"' : ''; ?>>
-                                    <?php echo htmlspecialchars($c_Title); ?>
+                            <div class="featured-product">
+                                <a href="detail.php?id=<?php echo $p_Id; ?>">
+                                    <?php if (!empty($p_Img)): ?>
+                                        <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                    <?php else: ?>
+                                        <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
+                                    <?php endif; ?>
                                 </a>
-                            </li>
+                                <div>
+                                    <h4><?php echo htmlspecialchars($p_Title); ?></h4>
+                                    <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
+                                </div>
+                            </div>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <li><span>Không có danh mục</span></li>
+                        <p style="color: #999;">Không có sản phẩm nổi bật</p>
                     <?php endif; ?>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Sản phẩm mới</h3>
+                    <?php if (!empty($latestProducts)): ?>
+                        <?php foreach ($latestProducts as $product): ?>
+                            <?php
+                                $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                                $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                                $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                                $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                            ?>
+                            <div class="featured-product">
+                                <a href="detail.php?id=<?php echo $p_Id; ?>">
+                                    <?php if (!empty($p_Img)): ?>
+                                        <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                    <?php else: ?>
+                                        <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
+                                    <?php endif; ?>
+                                </a>
+                                <div>
+                                    <h4><?php echo htmlspecialchars($p_Title); ?></h4>
+                                    <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p style="color: #999;">Không có sản phẩm nổi bật</p>
+                    <?php endif; ?>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>Sản phẩm bán chạy</h3>
+                    <!-- Lọc dựa trên số lượng bán -->
+
+                    <!-- <div class="featured-product">
+                        <img src="Images/SanPham/sample.jpg" alt="Sản phẩm bán chạy">
+                        <div>
+                            <h4>Latte</h4>
+                            <p>30.000 VND</p>
+                        </div>
+                    </div> -->
+                    <!-- Thêm nhiều hơn nếu cần -->
+                </div>
+            </aside>
+
+            <main class="main-content">
+                <div class="filter-bar">
+                    <form method="get" action="#" class="search-container">
+                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
+                        <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
+                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+
+                        <input type="search" name="searchString" placeholder="Tìm kiếm sản phẩm..." value="<?php echo htmlspecialchars($searchString) ?>">
+                        <button type="submit" style="position: absolute; right: 0; top: 0; height: 100%; width: 40px; background: none; border: none; cursor: pointer; color: #37474f;">
+                            <i class="fas fa-search search-icon" style="position: static; transform: none;"></i>
+                        </button>
+                    </form>
+                    <form method="get" action="#" id="sortForm">
+                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
+                        <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
+                        <input type="hidden" name="searchString" value="<?php echo htmlspecialchars($searchString); ?>">
+
+                        <select name="sort" onchange="document.getElementById('sortForm').submit()">
+                            <option value="" <?php echo $sort == '' ? 'selected' : ''; ?>>Tất cả</option>
+                            <option value="price_desc" <?php echo $sort == 'price_desc' ? 'selected' : ''; ?>>Giá cao đến thấp</option>
+                            <option value="price_asc" <?php echo $sort == 'price_asc' ? 'selected' : ''; ?>>Giá thấp đến cao</option>
+                            <option value="rate_desc" <?php echo $sort == 'rate_desc' ? 'selected' : ''; ?>>Đánh giá cao nhất</option>
+                            <option value="latest_desc" <?php echo $sort == 'latest_desc' ? 'selected' : ''; ?>>Sản phẩm mới nhất</option>
+                        </select>
+                    </form>
+                </div>
+
+                <div class="products-grid">
+                    <?php if (!empty($products)): ?>
+                        <?php foreach ($products as $product): ?>
+                            <?php
+                                $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
+                                $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
+                                $p_Content = is_object($product) ? $product->Content : (isset($product['Content']) ? $product['Content'] : '');
+                                $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
+                                $p_Rate = is_object($product) ? $product->Rate : (isset($product['Rate']) ? $product['Rate'] : 0);
+                                $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
+                                $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
+                            ?>
+                            <div class="card">
+                                <a href="detail.php?id=<?php echo $p_Id; ?>&&currentStoreId=<?php echo $storeId; ?>">
+                                    <?php if (!empty($p_Img)): ?>
+                                        <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
+                                    <?php else: ?>
+                                        <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
+                                    <?php endif; ?>
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title"><?php echo htmlspecialchars($p_Title); ?></h5>
+                                    <p class="card-text"><?php echo htmlspecialchars(substr($p_Content, 0, 100)); ?></p>
+                                    <span class="price"><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</span>
+                                    <form action="add_to_cart.php" method="POST">
+                                        <input type="hidden" name="action" value="add_to_cart">
+                                        <input type="hidden" name="product_id" value="<?php echo $p_Id; ?>">
+                                        <input type="hidden" name="store_id" value="<?php echo $storeId; ?>">
+                                        <input type="hidden" name="quantity" value="1">
+                                        <input type="hidden" name="current_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>"
+                                        <input type="hidden" name="current_url_params" value="<?php echo http_build_query($_GET); ?>">
+                                        <button type="submit" class="btn">
+                                            <i class="fa fa-shopping-bag me-2"></i>Thêm vào giỏ
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                            <p>Không tìm thấy sản phẩm nào</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <ul class="pagination">
+                    <?php
+                        $queryParams = http_build_query([
+                            'store' => $storeId,
+                            'category' => $categoryId,
+                            'searchString' => $searchString,
+                            'sort' => $sort,
+                        ]);
+                        $baseUrl = $_SERVER['PHP_SELF'] . '?' . $queryParams;
+
+                        if ($currentPage > 1) {
+                            $prevPage = $currentPage - 1;
+                            echo "<li><a href=\"{$baseUrl}&page={$prevPage}\">Trang trước</a></li>";
+                        }
+
+                        for ($i = 1; $i <= $maxPage; $i++) {
+                            $pageUrl = "{$baseUrl}&page={$i}";
+                            $activeClass = ($i == $currentPage) ? 'active' : '';
+                            echo "<li><a href=\"{$pageUrl}\" class=\"{$activeClass}\">{$i}</a></li>";
+                        }
+
+                        if ($currentPage < $maxPage) {
+                            $nextPage = $currentPage + 1;
+                            echo "<li><a href=\"{$baseUrl}&page={$nextPage}\">Trang sau</a></li>";
+                        }
+                    ?>
                 </ul>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm nổi bật</h3>
-                <?php if (!empty($featuredProducts)): ?>
-                    <?php foreach ($featuredProducts as $product): ?>
-                        <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                        ?>
-                        <div class="featured-product">
-                            <a href="detail.php?id=<?php echo $p_Id; ?>">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm nổi bật">
-                                <?php endif; ?>
-                            </a>
-                            <div>
-                                <h4><?php echo htmlspecialchars($p_Title); ?></h4>
-                                <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p style="color: #999;">Không có sản phẩm nổi bật</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm mới</h3>
-                <?php if (!empty($latestProducts)): ?>
-                    <?php foreach ($latestProducts as $product): ?>
-                        <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                        ?>
-                        <div class="featured-product">
-                            <a href="detail.php?id=<?php echo $p_Id; ?>">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                                <?php endif; ?>
-                            </a>
-                            <div>
-                                <h4><?php echo htmlspecialchars($p_Title); ?></h4>
-                                <p><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <p style="color: #999;">Không có sản phẩm nổi bật</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="sidebar-section">
-                <h3>Sản phẩm bán chạy</h3>
-                <!-- Lọc dựa trên số lượng bán -->
-
-                <!-- <div class="featured-product">
-                    <img src="Images/SanPham/sample.jpg" alt="Sản phẩm bán chạy">
-                    <div>
-                        <h4>Latte</h4>
-                        <p>30.000 VND</p>
-                    </div>
-                </div> -->
-                <!-- Thêm nhiều hơn nếu cần -->
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <div class="filter-bar">
-                <form method="get" action="#" class="search-container">
-                    <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
-                    <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
-                    <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
-
-                    <input type="search" name="searchString" placeholder="Tìm kiếm sản phẩm..." value="<?php echo htmlspecialchars($searchString) ?>">
-                    <button type="submit" style="position: absolute; right: 0; top: 0; height: 100%; width: 40px; background: none; border: none; cursor: pointer; color: #37474f;">
-                        <i class="fas fa-search search-icon" style="position: static; transform: none;"></i>
-                    </button>
-                </form>
-                <form method="get" action="#" id="sortForm">
-                    <input type="hidden" name="category" value="<?php echo htmlspecialchars($categoryId); ?>">
-                    <input type="hidden" name="store" value="<?php echo htmlspecialchars($storeId); ?>">
-                    <input type="hidden" name="searchString" value="<?php echo htmlspecialchars($searchString); ?>">
-
-                    <select name="sort" onchange="document.getElementById('sortForm').submit()">
-                        <option value="" <?php echo $sort == '' ? 'selected' : ''; ?>>Tất cả</option>
-                        <option value="price_desc" <?php echo $sort == 'price_desc' ? 'selected' : ''; ?>>Giá cao đến thấp</option>
-                        <option value="price_asc" <?php echo $sort == 'price_asc' ? 'selected' : ''; ?>>Giá thấp đến cao</option>
-                        <option value="rate_desc" <?php echo $sort == 'rate_desc' ? 'selected' : ''; ?>>Đánh giá cao nhất</option>
-                        <option value="latest_desc" <?php echo $sort == 'latest_desc' ? 'selected' : ''; ?>>Sản phẩm mới nhất</option>
-                    </select>
-                </form>
-            </div>
-
-            <div class="products-grid">
-                <?php if (!empty($products)): ?>
-                    <?php foreach ($products as $product): ?>
-                        <?php
-                            $p_Id = is_object($product) ? $product->Id : (isset($product['Id']) ? $product['Id'] : 0);
-                            $p_Title = is_object($product) ? $product->Title : (isset($product['Title']) ? $product['Title'] : '');
-                            $p_Content = is_object($product) ? $product->Content : (isset($product['Content']) ? $product['Content'] : '');
-                            $p_Price = is_object($product) ? $product->Price : (isset($product['Price']) ? $product['Price'] : 0);
-                            $p_Rate = is_object($product) ? $product->Rate : (isset($product['Rate']) ? $product['Rate'] : 0);
-                            $p_Img = is_object($product) ? $product->Img : (isset($product['Img']) ? $product['Img'] : '');
-                            $p_CategoryTitle = is_object($product) ? (isset($product->CategoryTitle) ? $product->CategoryTitle : '') : (isset($product['CategoryTitle']) ? $product['CategoryTitle'] : '');
-                        ?>
-                        <div class="card">
-                            <a href="detail.php?id=<?php echo $p_Id; ?>">
-                                <?php if (!empty($p_Img)): ?>
-                                    <img src="../../img/SanPham/<?php echo htmlspecialchars($p_Img); ?>" alt="<?php echo htmlspecialchars($p_Title); ?>">
-                                <?php else: ?>
-                                    <img src="../../img/SanPham/sample.jpg" alt="Sản phẩm">
-                                <?php endif; ?>
-                            </a>
-                            <div class="card-body">
-                                <h5 class="card-title"><?php echo htmlspecialchars($p_Title); ?></h5>
-                                <p class="card-text"><?php echo htmlspecialchars(substr($p_Content, 0, 100)); ?></p>
-                                <span class="price"><?php echo number_format($p_Price, 0, ',', '.'); ?> VND</span>
-                                <form action="../cart/add_to_cart.php" method="POST">
-                                    <input type="hidden" name="action" value="add_to_cart">
-                                    <input type="hidden" name="product_id" value="<?php echo $p_Id; ?>">
-                                    <input type="hidden" name="store_id" value="<?php echo $storeId; ?>">
-                                    <input type="hidden" name="quantity" value="1"> 
-                                    <input type="hidden" name="current_url_params" value="<?php echo http_build_query($_GET); ?>">
-                                    <button type="submit" class="btn">
-                                        <i class="fa fa-shopping-bag me-2"></i>Thêm vào giỏ
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
-                        <p>Không tìm thấy sản phẩm nào</p>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <ul class="pagination">
-                <li><a href="#">«</a></li>
-                <li><a class="active" href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">»</a></li>
-            </ul>
-        </main>
-    </div>
-
+            </main>
+        </div>
+    <?php else: ?>
+        <div style="text-align:center; padding:50px; color:#555;">
+            <p>Vui lòng chọn chi nhánh để xem sản phẩm.</p>
+        </div>
+    <?php endif; ?>
     <?php require_once '../footer.php'; ?>
 </body>
 

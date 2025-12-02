@@ -72,11 +72,6 @@
                     </select>
                     <button class="btn btn-primary">Lọc</button>
                 </div>
-                <div>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createModal">
-                        <i class="fa fa-plus"></i> Thêm doanh thu
-                    </button>
-                </div>
             </div>
 
             <div class="table-responsive">
@@ -88,7 +83,6 @@
                             <th>Tháng</th>
                             <th>Năm</th>
                             <th>Tổng doanh thu</th>
-                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -99,14 +93,6 @@
                             <td>11</td>
                             <td>2025</td>
                             <td>5,200,000 VND</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    <i class="fa fa-trash"></i>Xóa
-                                </button>
-                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -114,14 +100,6 @@
                             <td>11</td>
                             <td>2025</td>
                             <td>3,800,000 VND</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    <i class="fa fa-trash"></i>Xóa
-                                </button>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -134,100 +112,6 @@
                 <button class="btn btn-outline-dark mx-1">2</button>
                 <button class="btn btn-outline-dark mx-1">3</button>
                 <button class="btn btn-outline-dark mx-1">&raquo;</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <form class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Thêm doanh thu mới</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Cửa hàng</label>
-                        <select class="form-select">
-                            <option selected>Chọn cửa hàng</option>
-                            <option value="1">Cửa hàng Trung Nguyên 1</option>
-                            <option value="2">Cửa hàng Trung Nguyên 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Tháng</label>
-                        <input type="number" class="form-control" placeholder="Nhập tháng (1-12)">
-                    </div>
-                    <div class="mb-3">
-                        <label>Năm</label>
-                        <input type="number" class="form-control" placeholder="Nhập năm">
-                    </div>
-                    <div class="mb-3">
-                        <label>Tổng doanh thu</label>
-                        <input type="number" class="form-control" placeholder="Nhập tổng doanh thu">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-success">Thêm</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <form class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Sửa doanh thu</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Cửa hàng</label>
-                        <select class="form-select">
-                            <option selected>Cửa hàng Trung Nguyên 1</option>
-                            <option value="2">Cửa hàng Trung Nguyên 2</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label>Tháng</label>
-                        <input type="number" class="form-control" value="11">
-                    </div>
-                    <div class="mb-3">
-                        <label>Năm</label>
-                        <input type="number" class="form-control" value="2025">
-                    </div>
-                    <div class="mb-3">
-                        <label>Tổng doanh thu</label>
-                        <input type="number" class="form-control" value="5,200,000">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-warning">Lưu</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">Xóa doanh thu</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa bản ghi doanh thu này không?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
-                </div>
             </div>
         </div>
     </div>

@@ -14,15 +14,7 @@
         
         $cartController = new CartController();
         $result = $cartController->deleteItemInCart($customerId, $productId, $storeId); 
-        
-        if ($result) {
-            $_SESSION['success_message'] = "Đã xóa sản phẩm khỏi giỏ hàng thành công.";
-        } else {
-            $_SESSION['error_message'] = "Lỗi khi xóa sản phẩm hoặc bạn không có quyền xóa mục này.";
-        }
                 
-    } else {
-        $_SESSION['error_message'] = "Phương thức truy cập không hợp lệ.";
     }
     header('Location: ' . $redirect_url);
     exit();

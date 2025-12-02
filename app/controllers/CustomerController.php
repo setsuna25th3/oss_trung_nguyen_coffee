@@ -5,38 +5,25 @@
 
         class CustomerController {
             public function getCustomerByEmail($email){
-                global $hostname, $username, $password, $dbname, $port;
+                global $hostname, $username, $dbname, $port;
                 $db = new mysqli($hostname, $username, '', $dbname, $port);
 
-                $sql = "SELECT * FROM customer WHERE Email = '" . $email . "'";
+                $sql = "SELECT Id FROM customer WHERE Email = '" . $email . "'";
 
                 $result = $db->query($sql);
 
-                $customer = new Customer();
+                $customerId = 0;
                 if ($result->num_rows > 0) {
                     $row = $result->fetch_assoc();
-                    $customer->Id = $row['Id'];
-                    $customer->FirstName = $row['FirstName'];
-                    $customer->LastName = $row['LastName'];
-                    $customer->Address = $row['Address'];
-                    $customer->Phone = $row['Phone'];
-                    $customer->Email = $row['Email'];
-                    $customer->Img = $row['Img'];
-                    $customer->RegisteredAt = $row['RegisteredAt'];
-                    $customer->UpdateAt = $row['UpdateAt'];
-                    $customer->DateOfBirth = $row['DateOfBirth'];
-                    $customer->Password = $row['Password'];
-                    $customer->RandomKey = $row['RandomKey'];
-                    $customer->IsActive = $row['IsActive'];
-                    $customer->Role = $row['Role'];
+                    $customerId = $row['Id'];
                 }
                 $db->close();
-                return $customer;
+                return $customerId;
             }
 
             public function getCustomerById($id){
-                global $hostname, $username, $password, $dbname, $port;
-                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+                global $hostname, $username, $dbname, $port;
+                $db = new mysqli($hostname, $username, '', $dbname, $port);
 
                 $sql = "SELECT * FROM customer WHERE Id = " . (int)$id;
                 $result = $db->query($sql);

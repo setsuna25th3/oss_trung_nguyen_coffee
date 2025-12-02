@@ -6,12 +6,12 @@
     $productController = new ProductController();
     $categoryController = new CategoryController();
     $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
-    $storeId = 0;
+    $storeId = $_GET['currentStoreId'] ?? 0;
     $productId = $_GET['id'];
 
     $product = $productController->getProductById($productId);
-    $featuredProducts = $productController->getFeaturedProducts($_SESSION['currentStoreId'] ?? 0, 3);
-    $relatedProducts = $productController->getRelatedProducts($_SESSION['currentStoreId'] ?? 0, $productId);
+    $featuredProducts = $productController->getFeaturedProducts($storeId, 3);
+    $relatedProducts = $productController->getRelatedProducts($storeId, $productId);
     $categories = $categoryController->getAllCategories();
 ?>
 
@@ -152,9 +152,9 @@
     <div class="container-fluid page-header">
         <h1>Chi tiết sản phẩm</h1>
         <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="index.php">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="../home/index.php">Trang chủ</a></li>
             <span class="separator">/</span>
-            <li class="breadcrumb-item"><a href="product.php">Cửa hàng</a></li>
+            <li class="breadcrumb-item"><a href="index.php">Cửa hàng</a></li>
             <span class="separator">/</span>
             <li class="breadcrumb-item active">Chi tiết sản phẩm</li>
         </ul>
@@ -191,8 +191,11 @@
                                 <button class="btn btn-light border rounded-circle" id="increaseQuantity"><i class="fa fa-plus"></i></button>
                             </div>
 
-                            <form method="post" action="../cart/add_to_cart.php?id=<?php echo $product->Id; ?>">
+                            <form method="post" action="add_to_cart.php">
                                 <input type="hidden" id="hiddenQuantity" name="quantity" value="1">
+                                <input type="hidden" name="store_id" value="<?php echo $storeId; ?>">
+                                <input type="hidden" name="product_id" value="<?php echo $product->Id; ?>">
+                                <input type="hidden" name="current_url" value="<?php echo $_SERVER['REQUEST_URI']; ?>">
                                 <button type="submit" class="btn btn-outline-primary rounded-pill px-4 py-2 mb-4">
                                     <i class="fa fa-shopping-bag me-2"></i>Thêm
                                 </button>

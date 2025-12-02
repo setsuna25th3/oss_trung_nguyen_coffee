@@ -1,22 +1,19 @@
 <?php
     session_start();
-    require_once __DIR__ .'/../../controllers/CategoryController.php';
+    // require_once __DIR__ .'/../../controllers/CategoryController.php';
     require_once __DIR__ .'/../../controllers/CartController.php';
     require_once __DIR__ .'/../../controllers/ProductController.php';
     require_once __DIR__ .'/../../controllers/StoreController.php';
 
     $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : 0;
-    $categoryId = isset($_GET['category']) ? intval($_GET['category']) : 0;
     $storeId = isset($_GET['store']) ? intval($_GET['store']) : 0;
     $total = 0;
     $_SESSION['storeId'] = $storeId;
 
-    $categoryController = new CategoryController();
     $cartController = new CartController();
     $productController = new ProductController();
     $storeController = new StoreController();
 
-    $categories = $categoryController->getAllCategories();
     $carts = $cartController->getCartByCustomerId($customerId, $storeId);
     $stores = $storeController->getAllStores();
 ?>
@@ -111,13 +108,8 @@
             gap: 30px;
         }
 
-        .sidebar {
-            width: 25%;
-            min-width: 250px;
-        }
-
         .main-content {
-            width: 75%;
+            width: 100%;
         }
 
         .sidebar-section {
@@ -264,31 +256,6 @@
     </div>
 
     <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-section">
-                <h3>Danh mục</h3>
-                <ul>
-                    <?php if (!empty($categories)): ?>
-                        <li><a href="../product/index.php<?php echo $storeId > 0 ? '?store=' . $storeId : ''; ?>">Tất cả danh mục</a></li>
-                        <?php foreach ($categories as $cat): ?>
-                            <?php
-                                $c_Id = is_object($cat) ? $cat->Id : (isset($cat['Id']) ? $cat['Id'] : 0);
-                                $c_Title = is_object($cat) ? $cat->Title : (isset($cat['Title']) ? $cat['Title'] : '');
-                            ?>
-                            <li>
-                                <a href="../product/index.php?category=<?php echo $c_Id; ?><?php echo $storeId > 0 ? '&store=' . $storeId : ''; ?>"
-                                    <?php echo $categoryId == $c_Id ? 'style="color: #ffb300; font-weight: bold;"' : ''; ?>>
-                                    <?php echo htmlspecialchars($c_Title); ?>
-                                </a>
-                            </li>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <li><span>Không có danh mục</span></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </aside>
-
         <main class="main-content">
             <form method="get" action="" id="branchForm">
                 <select id="branchSelect" name="store" class="branch-select" onchange="document.getElementById('branchForm').submit()">
@@ -301,7 +268,7 @@
                                     $s_Address = is_object($store) ? (isset($store->Address) ? $store->Address : '') : (isset($store['Address']) ? $store['Address'] : '');
                                 ?>
                                 <option value="<?php echo $s_Id; ?>" <?php echo $storeId == $s_Id ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($s_Name) . (!empty($s_Address) ? ' - ' . htmlspecialchars($s_Address) : ''); ?>
+                                    <?php echo htmlspecialchars($s_Name); ?>
                                 </option>
                             <?php endforeach; ?>
                         <?php endif; ?>

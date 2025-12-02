@@ -61,9 +61,6 @@
 
         <div class="table-wrapper">
             <div class="d-flex justify-content-between mb-3">
-                <button class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#createModal">
-                    <i class="fa fa-plus"></i> Tạo hóa đơn mới
-                </button>
                 <div class="d-flex">
                     <input type="text" class="form-control me-2" placeholder="Tìm kiếm hóa đơn...">
                     <button class="btn btn-primary">Tìm kiếm</button>
@@ -83,7 +80,6 @@
                             <th>Mã vận đơn</th>
                             <th>Trạng thái</th>
                             <th>Ngày tạo</th>
-                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -97,10 +93,6 @@
                             <td>GHN123456</td>
                             <td>Đang xử lý</td>
                             <td>2025-12-01</td>
-                            <td>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
@@ -111,10 +103,6 @@
                             <td>VN456789</td>
                             <td>Đã giao</td>
                             <td>2025-12-02</td>
-                            <td>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -150,25 +138,6 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title text-danger">Xóa hóa đơn</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa hóa đơn này không?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
