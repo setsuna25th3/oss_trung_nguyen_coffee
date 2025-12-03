@@ -14,12 +14,12 @@
             $mail->isSMTP();                                           
             $mail->Host       = 'smtp.gmail.com';                      
             $mail->SMTPAuth   = true;                                  
-            $mail->Username   = 'your_email@gmail.com';                
-            $mail->Password   = 'your_app_password';                   
+            $mail->Username   = 'kinxedo78@gmail.com';                
+            $mail->Password   = 'orzc tvcb gezp acsc';                   
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            
             $mail->Port       = 587;                                   
 
-            $mail->setFrom('your_email@gmail.com', 'Hệ thống Trung Nguyên Coffee');
+            $mail->setFrom('kinxedo78@gmail.com', 'Hệ thống Trung Nguyên Coffee');
             $mail->addAddress($recipientEmail);     
             $mail->CharSet = 'UTF-8';               
 

@@ -26,6 +26,10 @@
                     return $reviews;
                 }
             }
+            public function addReview($customerId, ){
+                global $hostname, $username, $password, $dbname, $port;
+                $db = new mysqli($hostname, $username, $password, $dbname, $port);
+            }
         }
     }
 ?>

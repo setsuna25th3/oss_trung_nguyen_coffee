@@ -39,7 +39,7 @@
                     unset($_SESSION['OTP_Verified']);
                     
                     $_SESSION['LoginSuccessMessage'] = "Đặt lại mật khẩu thành công. Vui lòng đăng nhập.";
-                    header('Location: login.php');
+                    header('Location: sign_in.php');
                     exit();
                 } else {
                     $errorMessage = "Lỗi hệ thống: Không thể cập nhật mật khẩu.";
@@ -152,7 +152,7 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="login.php">Quay lại Đăng nhập</a>
+            <a href="sign_in.php">Quay lại Đăng nhập</a>
         </div>
     </div>
 </div>

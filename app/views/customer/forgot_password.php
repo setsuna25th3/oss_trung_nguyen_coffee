@@ -142,7 +142,7 @@
         </form>
 
         <div class="text-center mt-3">
-            <a href="../customer/login.php">Đăng nhập ngay</a>
+            <a href="../customer/sign_in.php">Đăng nhập ngay</a>
         </div>
     </div>
 </div>

@@ -267,7 +267,7 @@
 
                 <div class="profile-card p-5">
                     <div class="text-end mb-4">
-                        <button type="button" id="btnEdit" class="btn btn-outline-primary px-4">
+                        <button type="button" id="btnEdit" name="editButton" class="btn btn-outline-primary px-4">
                             <i class="fas fa-edit me-2"></i>Chỉnh sửa thông tin
                         </button>
                     </div>
@@ -279,14 +279,14 @@
                                 <div class="avatar-wrapper">
                                     <?php if($customer->Img ===  'avatar-default.png'): ?>
                                         <img src="../../img/KhachHang/avatar-default.png" alt="Avatar" class="avatar-img" id="image_preview">
-                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                        <label class="avatar-overlay" id="labelUploadImg" title="Đổi ảnh đại diện">
                                             <i class="fas fa-camera fa-lg"></i>
                                             <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
                                         </label>
                                     <?php else: ?>
                                         <img src="../../img/KhachHang/<?= md5(trim($customer->Email)) . '/' . $customer->Img ?>"
                                             alt="Avatar" class="avatar-img" id="image_preview">
-                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                        <label class="avatar-overlay" id="labelUploadImg" title="Đổi ảnh đại diện">
                                             <i class="fas fa-camera fa-lg"></i>
                                             <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
                                         </label>
@@ -295,16 +295,16 @@
                                 <input type="hidden" name="Img" value="<?= htmlspecialchars($customer->Img) ?>">
 
                                 <div class="mt-4 d-grid d-md-flex justify-content-center gap-3">
-                                    <a href="change_password.php" class="btn btn-outline-primary">
+                                    <a href="change_password.php" id="btnChangePassword" class="btn btn-outline-primary">
                                         <i class="fas fa-key me-2"></i>Đổi mật khẩu
                                     </a>
-                                    <a href="log_out.php" class="btn btn-danger">
+                                    <a href="log_out.php" id="btnLogOut" class="btn btn-danger">
                                         <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                     </a>
                                 </div>
 
                                 <div class="mt-4 text-center">
-                                    <a href="../payment/index.php" class="btn btn-primary btn-lg px-5">
+                                    <a href="../payment/index.php" id="btnViewOrders" class="btn btn-primary btn-lg px-5">
                                         <i class="fas fa-shopping-bag me-2"></i>Xem đơn hàng
                                     </a>
                                 </div>
@@ -378,6 +378,12 @@
         const btnCancel = document.getElementById('btnCancel');
         const actionButtons = document.getElementById('actionButtons');
         const formInputs = document.querySelectorAll('#profileForm input[name]:not([type="file"]):not([type="hidden"])');
+        const btnChangePassword = document.getElementById('btnChangePassword');
+        const btnLogOut = document.getElementById('btnLogOut');
+        const btnViewOrders = document.getElementById('btnViewOrders');
+        const labelUploadImg = document.getElementById('labelUploadImg');
+
+        labelUploadImg.style.display = 'none';
 
         // Bật chế độ chỉnh sửa
         btnEdit.addEventListener('click', function() {
@@ -390,12 +396,19 @@
 
             actionButtons.style.display = 'block';
             btnEdit.style.display = 'none';
+            labelUploadImg.style.display = '';
+            if (btnChangePassword) btnChangePassword.style.display = 'none';
+            if (btnLogOut) btnLogOut.style.display = 'none';
+            if (btnViewOrders) btnViewOrders.style.display = 'none';
         });
 
         // Hủy chỉnh sửa
         btnCancel.addEventListener('click', function() {
             if (confirm('Bạn có chắc muốn hủy các thay đổi?')) {
-                location.reload(); // Reload để quay về trạng thái ban đầu
+                if (btnChangePassword) btnChangePassword.style.display = '';
+                if (btnLogOut) btnLogOut.style.display = '';
+                if (btnViewOrders) btnViewOrders.style.display = '';
+                location.reload();
             }
         });
 
