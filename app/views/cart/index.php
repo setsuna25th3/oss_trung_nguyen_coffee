@@ -368,7 +368,7 @@
                                         <td colspan="7">
                                             <form style="text-align: right;" method="post" action="checkout_process.php" class="cartForm">
 
-                                                <p class="totalAmount" style="font-weight: bold;"><?php echo 'Tổng tiền: ' . number_format($storeTotal, 0, ',', '.'); ?> VNĐ</p>
+                                                <p class="totalAmount" style="font-weight: bold;"><?php echo "Tổng tiền: " . number_format($storeTotal, 0, ',', '.'); ?> VNĐ</p>
                                                 <button type="submit" class="btn checkoutBtn" <?php echo $storeTotal <= 0 ? 'disabled' : ''; ?>>Thanh toán</button>
                                                 <input type="hidden" name="storeId" value="<?php echo $storeId; ?>">
                                                 <input type="hidden" name="customerId" value="<?php echo $customerId; ?>">

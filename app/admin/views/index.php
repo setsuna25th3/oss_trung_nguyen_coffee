@@ -1,12 +1,20 @@
 <?php
     session_start();
-    $adminId = $_SESSION['CustomerId'];
-    $adminName = $_SESSION['CustomerName']; 
-    $title = "Trang Quản Trị - Trung Nguyên Coffee";
-    $page = $_GET['page'] ?? 'dashboard';
-    $allowed_pages = ['dashboard', 'category', 'product', 'store', 'employ', 'role', 'customer', 'payment', 'revenue', 'review', 'stats'];
-    if (!in_array($page, $allowed_pages)) {
-        $page = 'dashboard';
+    require_once '../../controllers/CustomerController.php';
+    $customerController = new CustomerController();
+    if($customerController->getCustomerById($_SESSION['CustomerId'])->Role){
+        $adminId = $_SESSION['CustomerId'];
+        $adminName = $_SESSION['CustomerName']; 
+        $title = "Trang Quản Trị - Trung Nguyên Coffee";
+        $page = $_GET['page'] ?? 'dashboard';
+        $allowed_pages = ['dashboard', 'category', 'product', 'store', 'employ', 'role', 'customer', 'payment', 'revenue', 'review', 'stats'];
+        if (!in_array($page, $allowed_pages)) {
+            $page = 'dashboard';
+        }
+    }
+    else{
+        header('Location: ../../views/home/index.php');
+        exit();
     }
 ?>
 <!DOCTYPE html>

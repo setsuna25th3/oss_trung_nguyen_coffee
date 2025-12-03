@@ -1,3 +1,31 @@
+<?php
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['CustomerId'])) {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    require_once __DIR__ . '/../../../controllers/CustomerController.php';
+    $customerController = new CustomerController();
+
+    $customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+    $categoryAdmins = [];
+
+    if ($customer && $customer->Role) {
+        require_once __DIR__ . '/../../controllers/CategoryAdminController.php'; 
+
+        $categoryAdminController = new CategoryAdminController();
+        $categoryAdmins = $categoryAdminController->getAllCategories();
+    } else {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    $categoriesJson = json_encode($categoryAdmins, JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -48,6 +76,18 @@
                 overflow-x: auto;
             }
         }
+
+        .modal-backdrop-white {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1050; 
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffffff; 
+            opacity: 0.8; 
+            transition: opacity 0.15s linear;
+        }
     </style>
 </head>
 
@@ -73,41 +113,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Demo row -->
-                        <tr>
-                            <td>1</td>
-                            <td>Cà phê rang</td>
-                            <td>Sản phẩm cà phê nguyên chất</td>
-                            <td>2024-01-01</td>
-                            <td>2024-01-05</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
+                        <?php if (!empty($categoryAdmins)): ?>
+                            <?php foreach($categoryAdmins as $category): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($category->Id); ?></td>
+                                    <td><?php echo htmlspecialchars($category->Title); ?></td>
+                                    <td><?php echo htmlspecialchars($category->Content); ?></td>
+                                    <td><?php echo date('d/m/Y H:i:s', strtotime($category->CreateAt)); ?></td>
+                                    <td><?php echo date('d/m/Y H:i:s', strtotime($category->UpdateAt)); ?></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-id="<?php echo $category->Id; ?>"><i class="fa fa-eye"></i>Chi tiết</button>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-id="<?php echo $category->Id; ?>"><i class="fa fa-edit"></i>Sửa</button>
+                                        <!-- <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="<?php echo $category->Id; ?>"><i class="fa fa-trash"></i>Xóa</button> -->
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center">Không có danh mục nào được tìm thấy.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_create_category.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm danh mục mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Tên danh mục</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên danh mục">
+                        <label for="create-title">Tên danh mục</label>
+                        <input type="text" class="form-control" id="create-title" name="title" placeholder="Nhập tên danh mục" required>
                     </div>
                     <div class="mb-3">
-                        <label>Nội dung</label>
-                        <textarea class="form-control" placeholder="Nhập mô tả"></textarea>
+                        <label for="create-content">Nội dung</label>
+                        <textarea class="form-control" id="create-content" name="content" placeholder="Nhập mô tả"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -118,22 +164,22 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_edit_category.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa danh mục</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" name="categoryId" id="edit-category-id">
                     <div class="mb-3">
-                        <label>Tên danh mục</label>
-                        <input type="text" class="form-control" value="Cà phê rang">
+                        <label for="edit-title">Tên danh mục</label>
+                        <input type="text" class="form-control" id="edit-title" name="title">
                     </div>
                     <div class="mb-3">
-                        <label>Nội dung</label>
-                        <textarea class="form-control">Sản phẩm cà phê nguyên chất</textarea>
+                        <label for="edit-content">Nội dung</label>
+                        <textarea class="form-control" id="edit-content" name="content"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -144,8 +190,7 @@
         </div>
     </div>
 
-    <!-- View Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -153,10 +198,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Tên danh mục:</strong> Cà phê rang</p>
-                    <p><strong>Nội dung:</strong> Sản phẩm cà phê nguyên chất</p>
-                    <p><strong>Ngày tạo:</strong> 2024-01-01</p>
-                    <p><strong>Ngày cập nhật:</strong> 2024-01-05</p>
+                    <p><strong>Mã danh mục:</strong> <span id="view-id"></span></p>
+                    <p><strong>Tên danh mục:</strong> <span id="view-title"></span></p>
+                    <p><strong>Nội dung:</strong> <span id="view-content"></span></p>
+                    <p><strong>Ngày tạo:</strong> <span id="view-create-at"></span></p>
+                    <p><strong>Ngày cập nhật:</strong> <span id="view-update-at"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -164,9 +210,8 @@
             </div>
         </div>
     </div>
-
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    
+    <!-- <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -174,17 +219,96 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa danh mục này không?
+                    Bạn có chắc chắn muốn xóa danh mục **<span id="delete-category-title-display"></span>** (ID: <span id="delete-category-id-display"></span>) này không? Hành động này không thể hoàn tác.
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
+                    <a id="confirmDeleteLink" class="btn btn-danger" href="#">Xóa</a>
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const categoriesData = <?php echo $categoriesJson; ?>;
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        const viewModal = document.getElementById('viewModal');
+        const editModal = document.getElementById('editModal');
+        const createModal = document.getElementById('createModal');
+        const deleteModal = document.getElementById('deleteModal');
+
+        const modalElements = [createModal, viewModal, editModal, deleteModal];
+
+        function showWhiteBackdrop() {
+            const backdrop = document.createElement('div');
+            backdrop.classList.add('modal-backdrop-white');
+            document.body.appendChild(backdrop);
+        }
+
+        function removeWhiteBackdrop() {
+            const backdrop = document.querySelector('.modal-backdrop-white');
+            if (backdrop) {
+                backdrop.remove();
+            }
+        }
+
+        modalElements.forEach(modalElement => {
+            modalElement.addEventListener('show.bs.modal', function (event) {
+                showWhiteBackdrop();
+
+                const button = event.relatedTarget; 
+                const categoryId = button ? button.getAttribute('data-bs-id') : null;
+                
+                if (categoryId) {
+                    const category = categoriesData.find(c => c.Id == categoryId);
+
+                    if (!category) {
+                        console.error('Không tìm thấy danh mục với ID:', categoryId);
+                        return;
+                    }
+
+                    if (modalElement.id === 'viewModal') {
+                        document.getElementById('view-id').innerText = category.Id;
+                        document.getElementById('view-title').innerText = category.Title;
+                        document.getElementById('view-content').innerText = category.Content;
+                        document.getElementById('view-create-at').innerText = formatDate(category.CreateAt);
+                        document.getElementById('view-update-at').innerText = formatDate(category.UpdateAt);
+                    }
+
+                    if (modalElement.id === 'editModal') {
+                        document.getElementById('edit-category-id').value = category.Id;
+                        document.getElementById('edit-title').value = category.Title;
+                        document.getElementById('edit-content').value = category.Content;
+                        modalElement.querySelector('form').action = 'process_edit_category.php';
+                    }
+
+                    // if (modalElement.id === 'deleteModal') {
+                    //     document.getElementById('delete-category-id-display').innerText = category.Id;
+                    //     document.getElementById('delete-category-title-display').innerText = category.Title;
+                    //     document.getElementById('confirmDeleteLink').href = 'process_delete_category.php?id=' + category.Id;
+                    // }
+                }
+            });
+
+            modalElement.addEventListener('hidden.bs.modal', function () {
+                removeWhiteBackdrop();
+            });
+        });
+    </script>
 </body>
 
 </html>

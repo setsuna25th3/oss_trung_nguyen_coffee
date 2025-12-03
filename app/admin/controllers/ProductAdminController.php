@@ -95,8 +95,36 @@
             return $result;
         }
 
-        public function deleteProduct($productId){
-
+        public function updateProduct($product, $newImage = null) {
+            global $hostname, $username, $password, $dbname, $port;
+            $db = new mysqli($hostname, $username, $password, $dbname, $port);
+            if ($newImage) {
+                $sql = "UPDATE product SET Title=?, Content=?, Img=?, Price=?, Rate=?, UpdateAt=NOW(), CategoryId=? WHERE Id=?";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("sssisii",
+                    $product->Title,
+                    $product->Content,
+                    $newImage,
+                    $product->Price,
+                    $product->Rate,
+                    $product->CategoryId,
+                    $product->Id);
+            } else {
+                $sql = "UPDATE product SET Title=?, Content=?, Price=?, Rate=?, UpdateAt=NOW(), CategoryId=? WHERE Id=?";
+                $stmt = $db->prepare($sql);
+                $stmt->bind_param("ssisii",
+                    $product->Title,
+                    $product->Content,
+                    $product->Price,
+                    $product->Rate,
+                    $product->CategoryId,
+                    $product->Id);
+            }
+            $isSuccess = $stmt->execute();
+            $result = $isSuccess && ($stmt->affected_rows > 0);
+            $stmt->close();
+            $db->close();
+            return $result;
         }
     }
 ?>

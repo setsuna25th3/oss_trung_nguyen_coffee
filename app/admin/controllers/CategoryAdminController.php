@@ -1,6 +1,6 @@
 <?php
     require_once __DIR__ .'/../../config/env.php';
-    require_once __DIR__ .'/../admin/models/CategoryAdmin.php';
+    require_once __DIR__ .'/../models/CategoryAdmin.php';
 
     class CategoryAdminController {
         public function getAllCategories(){

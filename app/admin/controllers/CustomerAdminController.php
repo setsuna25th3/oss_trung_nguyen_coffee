@@ -3,6 +3,35 @@
     require_once __DIR__ . '/../models/CustomerAdmin.php';
 
     class CustomerAdminController{
+        public function getAllCustomers(){
+            global $hostname, $username, $dbname, $port;
+            $db = new mysqli($hostname, $username, '', $dbname, $port);
+            $sql = "SELECT * FROM customer WHERE Role = 0";
+            $result = $db->query($sql);
+            $customers = [];
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()){
+                    $customer = new CustomerAdmin();
+                    $customer->Id = $row['Id'];
+                    $customer->FirstName = $row['FirstName'];
+                    $customer->LastName = $row['LastName'];
+                    $customer->Address = $row['Address'];
+                    $customer->Phone = $row['Phone'];
+                    $customer->Email = $row['Email'];
+                    $customer->Img = $row['Img'];
+                    $customer->RegisteredAt = $row['RegisteredAt'];
+                    $customer->UpdateAt = $row['UpdateAt'];
+                    $customer->DateOfBirth = $row['DateOfBirth'];
+                    $customer->Password = $row['Password'];
+                    $customer->RandomKey = $row['RandomKey'];
+                    $customer->IsActive = $row['IsActive'];
+                    $customer->Role = $row['Role'];
+                    $customers[] = $customer;
+                }
+            }
+            $db->close();
+            return $customers;
+        }        
         public function getCustomerById($id){
             global $hostname, $username, $dbname, $port;
             $db = new mysqli($hostname, $username, '', $dbname, $port);
