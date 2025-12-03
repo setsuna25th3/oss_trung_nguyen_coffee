@@ -1,12 +1,21 @@
 <?php
-$title = "Trang Quản Trị - Trung Nguyên Coffe";
-
-// Xác định page mặc định
-$page = $_GET['page'] ?? 'dashboard';
-$allowed_pages = ['dashboard', 'catagory', 'product', 'store', 'employ', 'role', 'customer', 'payment', 'revenue', 'rate', 'stats'];
-if (!in_array($page, $allowed_pages)) {
-    $page = 'dashboard';
-}
+    session_start();
+    require_once '../../controllers/CustomerController.php';
+    $customerController = new CustomerController();
+    if($customerController->getCustomerById($_SESSION['CustomerId'])->Role){
+        $adminId = $_SESSION['CustomerId'];
+        $adminName = $_SESSION['CustomerName']; 
+        $title = "Trang Quản Trị - Trung Nguyên Coffee";
+        $page = $_GET['page'] ?? 'dashboard';
+        $allowed_pages = ['dashboard', 'category', 'product', 'store', 'employ', 'role', 'customer', 'payment', 'revenue', 'review', 'stats'];
+        if (!in_array($page, $allowed_pages)) {
+            $page = 'dashboard';
+        }
+    }
+    else{
+        header('Location: ../../views/home/index.php');
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -145,19 +154,19 @@ if (!in_array($page, $allowed_pages)) {
 
         <div class="navbar-header mb-3">
             <img src="../../img/Logo/logo.jpg" alt="Logo" class="navbar-logo">
-            <div class="navbar-title fw-bolder">Xin chào, Admin</div>
+            <div class="navbar-title fw-bolder">Xin chào, <?php echo $adminName ?></div>
         </div>
         <a href="../../views/home/index.php" class="no-ajax"><i class="fas fa-arrow-left"></i></i><span> Trang khách</span></a>
         <a href="?page=dashboard"><i class="fas fa-home"></i><span> Trang quản trị</span></a>
-        <a href="?page=catagory"><i class="fas fa-list-alt"></i><span> Quản lý danh mục</span></a>
+        <a href="?page=category"><i class="fas fa-list-alt"></i><span> Quản lý danh mục</span></a>
         <a href="?page=product"><i class="fas fa-glass-martini-alt"></i><span> Quản lý sản phẩm</span></a>
         <a href="?page=store"><i class="fas fa-store"></i><span> Quản lý cửa hàng</span></a>
-        <a href="?page=employ"><i class="fas fa-users"></i><span> Quản lý nhân viên</span></a>
+        <a href="?page=employee"><i class="fas fa-users"></i><span> Quản lý nhân viên</span></a>
         <a href="?page=role"><i class="fas fa-user-tag"></i></i><span> Quản lý chức vụ</span></a>
         <a href="?page=customer"><i class="fas fa-user-tie"></i><span> Quản lý khách hàng</span></a>
         <a href="?page=payment"><i class="fas fa-file-invoice"></i><span> Quản lý hóa đơn</span></a>
         <a href="?page=revenue"><i class="fas fa-chart-line"></i><span> Quản lý doanh thu</span></a>
-        <a href="?page=rate"><i class="fas fa-star"></i><span> Quản lý đánh giá</span></a>
+        <a href="?page=review"><i class="fas fa-star"></i><span> Quản lý đánh giá</span></a>
         <a href="?page=stats"><i class="fas fa-chart-bar"></i><span> Thống kê</span></a>
     </nav>
 

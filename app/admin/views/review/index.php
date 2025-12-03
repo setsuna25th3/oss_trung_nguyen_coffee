@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý hóa đơn</title>
+    <title>Quản lý đánh giá sản phẩm</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <style>
@@ -39,7 +39,7 @@
             margin-right: 5px;
         }
 
-        .btn-add {
+        .filter-section {
             margin-bottom: 15px;
         }
 
@@ -57,14 +57,20 @@
 
 <body>
     <div class="container my-5">
-        <h1>Quản lý hóa đơn</h1>
+        <h1>Quản lý đánh giá sản phẩm</h1>
 
         <div class="table-wrapper">
-            <div class="d-flex justify-content-between mb-3">
+
+            <!-- Lọc theo sản phẩm -->
+            <div class="filter-section d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex">
-                    <input type="text" class="form-control me-2" placeholder="Tìm kiếm hóa đơn...">
-                    <button class="btn btn-primary">Tìm kiếm</button>
-                    <button class="btn btn-outline-dark ms-2">Quay lại danh sách</button>
+                    <select class="form-select me-2">
+                        <option selected>Chọn sản phẩm</option>
+                        <option value="1">Cà phê Arabica</option>
+                        <option value="2">Cà phê Robusta</option>
+                        <option value="3">Cà phê Blend</option>
+                    </select>
+                    <button class="btn btn-primary">Lọc</button>
                 </div>
             </div>
 
@@ -73,36 +79,41 @@
                     <thead>
                         <tr>
                             <th>Mã</th>
+                            <th>Sản phẩm</th>
                             <th>Khách hàng</th>
-                            <th>Cửa hàng</th>
-                            <th>Tổng tiền</th>
-                            <th>Đơn vị vận chuyển</th>
-                            <th>Mã vận đơn</th>
-                            <th>Trạng thái</th>
+                            <th>Đánh giá</th>
+                            <th>Bình luận</th>
                             <th>Ngày tạo</th>
+                            <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Dữ liệu mẫu -->
                         <tr>
                             <td>1</td>
+                            <td>Cà phê Arabica</td>
                             <td>Nguyễn Văn A</td>
-                            <td>Cửa hàng Trung Nguyên 1</td>
-                            <td>1,200,000 VND</td>
-                            <td>Giao hàng nhanh</td>
-                            <td>GHN123456</td>
-                            <td>Đang xử lý</td>
-                            <td>2025-12-01</td>
+                            <td>5</td>
+                            <td>Rất thơm và ngon!</td>
+                            <td>2025-12-01 08:00</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fa fa-trash"></i>Xóa
+                                </button>
+                            </td>
                         </tr>
                         <tr>
                             <td>2</td>
+                            <td>Cà phê Robusta</td>
                             <td>Trần Thị B</td>
-                            <td>Cửa hàng Trung Nguyên 2</td>
-                            <td>850,000 VND</td>
-                            <td>VNPost</td>
-                            <td>VN456789</td>
-                            <td>Đã giao</td>
-                            <td>2025-12-02</td>
+                            <td>4</td>
+                            <td>Hương vị đậm đà, vừa miệng.</td>
+                            <td>2025-12-01 09:15</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="fa fa-trash"></i>Xóa
+                                </button>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -118,26 +129,20 @@
             </div>
         </div>
     </div>
-
-    <!-- View Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Chi tiết hóa đơn</h5>
+                    <h5 class="modal-title text-danger">Xóa đánh giá</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Khách hàng:</strong> Nguyễn Văn A</p>
-                    <p><strong>Cửa hàng:</strong> Cửa hàng Trung Nguyên 1</p>
-                    <p><strong>Tổng tiền:</strong> 1,200,000 VND</p>
-                    <p><strong>Đơn vị vận chuyển:</strong> Giao hàng nhanh</p>
-                    <p><strong>Mã vận đơn:</strong> GHN123456</p>
-                    <p><strong>Trạng thái:</strong> Đang xử lý</p>
-                    <p><strong>Ngày tạo:</strong> 2025-12-01</p>
+                    Bạn có chắc chắn muốn xóa đánh giá này không?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger">Xóa</button>
                 </div>
             </div>
         </div>
