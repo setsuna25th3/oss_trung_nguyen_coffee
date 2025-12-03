@@ -39,6 +39,8 @@ if (isset($_POST['SignIn'])) {
         } else {
             $_SESSION['CustomerId'] = $customer->Id;
             $_SESSION['CustomerName'] = $customer->LastName . ' ' . $customer->FirstName;
+            $_SESSION['Role'] = $customer->Role ?? 0;
+
 
             if ($customer->Role) {
                 header('Location: ../../admin/views/index.php');

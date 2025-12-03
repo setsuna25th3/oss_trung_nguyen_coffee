@@ -22,7 +22,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
     $customer->Phone = trim($_POST['Phone']);
     $customer->DateOfBirth = $_POST['DateOfBirth'];
     $customer->Address = trim($_POST['Address']);
-    $customer->Email = trim($_POST['Email']); // Thêm dòng này để đảm bảo Email được giữ nguyên
+    $customer->Email = trim($_POST['Email']);
+    $customer->ProvinceId = $_POST['ProvinceId'] ?? null;
+    $customer->DistrictId = $_POST['DistrictId'] ?? null;
+    $customer->WardCode   = $_POST['WardCode'] ?? null;
 
     if (isset($_FILES['ImgUpload']) && $_FILES['ImgUpload']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = __DIR__ . '/../../img/KhachHang/' . md5(trim($customer->Email)) . '/';
@@ -39,9 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
     $updateResult = $customerController->updateCustomer($customer);
     if ($updateResult) {
         $_SESSION['ProfileSuccessMessage'] = 'Cập nhật thông tin cá nhân thành công.';
+        $_SESSION['CustomerName'] = $customer->LastName . ' ' . $customer->FirstName;
     } else {
         $_SESSION['ProfileErrorMessage'] = 'Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.';
     }
+
     header("Location: profile.php");
     exit();
 }
@@ -361,6 +366,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
                                             class="form-control" readonly>
                                     </div>
 
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Tỉnh/Thành phố</label>
+                                        <select name="ProvinceId" id="ProvinceId" class="form-control" required disabled>
+                                            <option value="">-- Chọn Tỉnh/Thành --</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Quận/Huyện</label>
+                                        <select name="DistrictId" id="DistrictId" class="form-control" required disabled>
+                                            <option value="">-- Chọn Quận/Huyện --</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold">Phường/Xã</label>
+                                        <select name="WardCode" id="WardCode" class="form-control" required disabled>
+                                            <option value="">-- Chọn Phường/Xã --</option>
+                                        </select>
+                                    </div>
+
                                     <!-- Nút Lưu / Hủy (ẩn mặc định) -->
                                     <div class="col-12 text-end mt-4" id="actionButtons" style="display:none;">
                                         <button type="button" id="btnCancel" class="btn btn-secondary me-3 px-4">
@@ -394,22 +420,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
         const orderButton = document.getElementById('orderButton');
 
         btnEdit.addEventListener('click', function() {
-            formInputs.forEach(input => {
-                input.removeAttribute('readonly');
-            });
+            // Enable input
+            formInputs.forEach(input => input.removeAttribute('readonly'));
+            provinceSelect.removeAttribute('disabled');
+            districtSelect.removeAttribute('disabled');
+            wardSelect.removeAttribute('disabled');
 
-            // Hiện icon đổi ảnh
+            // Hiện avatar change
             avatarChangeBtn.style.display = 'flex';
 
-            // Ẩn nút đăng xuất và đổi mật khẩu
-            accountButtons.style.display = 'none';
+            // Ẩn các nút khác
+            if (accountButtons) accountButtons.classList.add('d-none');
+            if (orderButton) orderButton.classList.add('d-none');
 
             // Hiện nút Lưu / Hủy
-            actionButtons.style.display = 'block';
+            if (actionButtons) actionButtons.classList.remove('d-none');
 
             // Ẩn nút chỉnh sửa
-            btnEdit.style.display = 'none';
+            btnEdit.classList.add('d-none');
         });
+
 
         // Hủy chỉnh sửa
         btnCancel.addEventListener('click', function() {
@@ -433,6 +463,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
                 setTimeout(() => a.remove(), 600);
             });
         }, 4000);
+        const GHN_TOKEN = "ed799cbf-cfee-11f0-84c8-a649637e7c2d";
+        const provinceSelect = document.getElementById('ProvinceId');
+        const districtSelect = document.getElementById('DistrictId');
+        const wardSelect = document.getElementById('WardCode');
+
+        // Giá trị hiện tại của khách hàng từ PHP
+        const currentProvinceId = <?= json_encode($customer->ProvinceId) ?>;
+        const currentDistrictId = <?= json_encode($customer->DistrictId) ?>;
+        const currentWardCode = <?= json_encode($customer->WardCode) ?>;
+
+        // Load tỉnh
+        function loadProvinces() {
+            provinceSelect.innerHTML = '<option value="">Đang tải Tỉnh/Thành...</option>';
+            fetch('https://online-gateway.ghn.vn/shiip/public-api/master-data/province', {
+                    headers: {
+                        "Token": GHN_TOKEN
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành --</option>';
+                    data.data.forEach(p => {
+                        const opt = document.createElement('option');
+                        opt.value = p.ProvinceID;
+                        opt.textContent = p.ProvinceName;
+                        if (p.ProvinceID == currentProvinceId) opt.selected = true;
+                        provinceSelect.appendChild(opt);
+                    });
+                    if (currentProvinceId) loadDistricts(currentProvinceId);
+                });
+        }
+
+        // Load quận
+        function loadDistricts(provinceId) {
+            districtSelect.innerHTML = '<option value="">Đang tải Quận/Huyện...</option>';
+            fetch(`https://online-gateway.ghn.vn/shiip/public-api/master-data/district?province_id=${provinceId}`, {
+                    headers: {
+                        "Token": GHN_TOKEN
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+                    data.data.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.DistrictID;
+                        opt.textContent = d.DistrictName;
+                        if (d.DistrictID == currentDistrictId) opt.selected = true;
+                        districtSelect.appendChild(opt);
+                    });
+                    if (currentDistrictId) loadWards(currentDistrictId);
+                });
+        }
+
+        // Load phường
+        function loadWards(districtId) {
+            wardSelect.innerHTML = '<option value="">Đang tải Phường/Xã...</option>';
+            fetch(`https://online-gateway.ghn.vn/shiip/public-api/master-data/ward?district_id=${districtId}`, {
+                    headers: {
+                        "Token": GHN_TOKEN
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+                    data.data.forEach(w => {
+                        const opt = document.createElement('option');
+                        opt.value = w.WardCode;
+                        opt.textContent = w.WardName;
+                        if (w.WardCode == currentWardCode) opt.selected = true;
+                        wardSelect.appendChild(opt);
+                    });
+                });
+        }
+
+        // Khi đổi tỉnh
+        provinceSelect.addEventListener('change', function() {
+            const provinceId = this.value;
+            districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            if (provinceId) loadDistricts(provinceId);
+        });
+
+        // Khi đổi quận
+        districtSelect.addEventListener('change', function() {
+            const districtId = this.value;
+            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            if (districtId) loadWards(districtId);
+        });
+
+        // Khi DOM load
+        window.addEventListener('DOMContentLoaded', loadProvinces);
+
+        // Khi nhấn chỉnh sửa → enable selects
+        btnEdit.addEventListener('click', function() {
+            formInputs.forEach(input => input.removeAttribute('readonly'));
+            provinceSelect.removeAttribute('disabled');
+            districtSelect.removeAttribute('disabled');
+            wardSelect.removeAttribute('disabled');
+            avatarChangeBtn.style.display = 'flex';
+            accountButtons.style.display = 'none';
+            actionButtons.style.display = 'block';
+            btnEdit.style.display = 'none';
+        });
     </script>
 </body>
 

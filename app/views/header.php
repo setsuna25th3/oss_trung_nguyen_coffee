@@ -1,6 +1,8 @@
 <?php
 $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
 $customerName = isset($_SESSION['CustomerName']) ? $_SESSION['CustomerName'] : null;
+$role = $_SESSION['Role'] ?? 0;
+
 
 if ($customerId) {
     require_once '../../controllers/CartController.php';
@@ -281,6 +283,10 @@ if ($customerId) {
             </div>
 
             <a href="../contact/index.php">Liên hệ</a>
+            <?php if (!empty($_SESSION['Role']) && $_SESSION['Role'] == 1): ?>
+                <a href="../../admin/views/index.php">Trang quản trị</a>
+            <?php endif; ?>
+
         </div>
 
         <div class="menu-icons">

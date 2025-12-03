@@ -12,6 +12,7 @@ if (!isset($_SESSION['CustomerId'])) {
     exit();
 }
 
+
 $customerId = $_SESSION['CustomerId'];
 
 $storeId = 0;
@@ -190,6 +191,9 @@ $grandTotal = $storeTotal + $storeShippingFee;
         <form id="checkoutForm" method="POST" style="margin-top: 30px; display:flex; flex-direction: column; gap:15px;">
             <input type="hidden" name="storeId" value="<?= $storeId ?>">
             <input type="hidden" name="grandTotal" value="<?= $grandTotal ?>">
+            <input type="hidden" name="vnp_order_id" value="<?= time() ?>">
+            <input type="hidden" name="vnp_amount" value="<?= $grandTotal ?>">
+
 
             <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
                 <label class="paymentOption">
@@ -297,17 +301,14 @@ $grandTotal = $storeTotal + $storeShippingFee;
                 const form = document.getElementById('checkoutForm');
 
                 if (method === 'cod') {
-                    // COD → gửi sang checkout_process.php
                     showToast('Đặt hàng thành công! Thanh toán khi nhận hàng.');
+                    // COD → gửi sang checkout_process.php
                     form.action = 'checkout_process.php';
-                    setTimeout(() => form.submit(), 1500);
+                    setTimeout(() => form.submit(), 3000);
                 } else if (method === 'bank') {
-                    // Bank → xử lý VNPay
-                    showToast('Chuyển hướng sang VNPay...');
-                    setTimeout(() => {
-                        form.action = '/oss_trung_nguyen_coffee/app/vnpay_php/vnpay_create_payment.php';
-                        form.submit();
-                    }, 1500);
+                    // Bank → gửi sang VNPay, dùng POST
+                    form.action = '/oss_trung_nguyen_coffee/app/vnpay_php/vnpay_create_payment.php';
+                    form.submit();
                 }
             });
         </script>

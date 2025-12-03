@@ -114,7 +114,7 @@ if (!class_exists('CustomerController')) {
                     WHERE Id = ?";
             $stmt = $db->prepare($sql);
             $stmt->bind_param(
-                "sssssiiiiii",
+                "ssssssiiii",
                 $customer->FirstName,
                 $customer->LastName,
                 $customer->Address,
@@ -126,6 +126,7 @@ if (!class_exists('CustomerController')) {
                 $customer->WardCode,
                 $customer->Id
             );
+
             $result = $stmt->execute();
             return $result && ($stmt->affected_rows > 0);
         }
