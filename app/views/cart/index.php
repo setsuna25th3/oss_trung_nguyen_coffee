@@ -371,7 +371,7 @@ foreach ($stores as $store) {
 
                                     <tr>
                                         <td colspan="7">
-                                            <form style="text-align: right;" method="post" action="checkout_process.php" class="cartForm">
+                                            <form style="text-align: right;" method="GET" action="checkout.php" class="cartForm">
 
                                                 <p class="totalAmount" style="font-weight: bold;"><?php echo 'Tổng tiền: ' . number_format($storeTotal, 0, ',', '.'); ?> VNĐ</p>
                                                 <button type="submit" class="btn checkoutBtn" <?php echo $storeTotal <= 0 ? 'disabled' : ''; ?>>Thanh toán</button>
@@ -463,6 +463,7 @@ foreach ($stores as $store) {
 
                     const row = this.closest('tr');
                     const storeId = row.closest('.store-section').dataset.storeId;
+                    const productId = this.dataset.productId;
                     const price = parseInt(row.querySelector('td:nth-child(4)').textContent.replace(/\D/g, ''));
                     const newTotal = price * quantity;
 
@@ -472,6 +473,25 @@ foreach ($stores as $store) {
 
                     updateStoreTotal(storeId);
                     updateHeaderCart();
+
+                    fetch('ajax_cart.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                            body: new URLSearchParams({
+                                action: 'update_quantity',
+                                productId: productId,
+                                storeId: storeId,
+                                quantity: quantity
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data.success) {
+                                alert('Cập nhật giỏ hàng thất bại!');
+                            }
+                        });
                 });
             });
 
@@ -503,7 +523,7 @@ foreach ($stores as $store) {
 
                                 const tbody = section.querySelector('tbody');
                                 if (!tbody.querySelectorAll('tr.product-row').length) {
-                                    section.remove(); // Xóa cả section nếu không còn sản phẩm
+                                    section.remove();
                                 }
 
 

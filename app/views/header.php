@@ -69,7 +69,7 @@ if ($customerId) {
         padding: 16px 80px;
         background-color: white;
         position: fixed;
-        top: 59px;
+        top: 52px;
         left: 0;
         width: 100%;
         z-index: 999;

@@ -96,7 +96,6 @@ if (!class_exists('CartController')) {
             return $result && ($stmt->affected_rows > 0);
         }
 
-        // **Cập nhật số lượng sản phẩm**
         public function updateQuantity($customerId, $productId, $storeId, $quantity)
         {
             global $hostname, $username, $password, $dbname, $port;
@@ -109,6 +108,19 @@ if (!class_exists('CartController')) {
 
             $db->close();
             return $result && ($stmt->affected_rows > 0);
+        }
+        public function removeFromCart($customerId, $productId, $storeId)
+        {
+            global $hostname, $username, $password, $dbname, $port;
+            $db = new mysqli($hostname, $username, $password, $dbname, $port);
+
+            $stmt = $db->prepare("DELETE FROM cart WHERE CustomerId=? AND ProductId=? AND StoreId=?");
+            $stmt->bind_param("iii", $customerId, $productId, $storeId);
+            $stmt->execute();
+            $stmt->close();
+            $db->close();
+
+            return true;
         }
     }
 }

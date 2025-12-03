@@ -1,14 +1,17 @@
 <?php
 session_start();
 $signUpSuccessMessage = $_SESSION['SignUpSuccessMessage'] ?? '';
+$signInErrorMessage = $_SESSION['SignInErrorMessage'] ?? '';
+
 unset($_SESSION['SignUpSuccessMessage']);
+unset($_SESSION['SignInErrorMessage']);
+
 include '../../models/Customer.php';
 include '../../controllers/CustomerController.php';
 
 
 $email = $_POST['email'] ?? '';
 $password = $_POST['password'] ?? '';
-$errors = [];
 
 function printVar($var)
 {
@@ -16,16 +19,20 @@ function printVar($var)
 }
 
 if (isset($_POST['SignIn'])) {
-
     $customerController = new CustomerController();
-    $customer = $customerController->getCustomerByEmail($email);
+    $customerId = $customerController->getCustomerByEmail($email);
 
-    if (!$customer) {
-        $errors[] = 'Không tìm thấy tài khoản với email này.';
-    } else if (!password_verify($password, $customer->Password)) {
-        $errors[] = 'Mật khẩu không đúng.';
+    if (empty($customerId)) {
+        $_SESSION['SignInErrorMessage'] = 'Không tìm thấy tài khoản với email này.';
+        header('Location: sign_in.php');
+        exit();
     } else {
-        if (!$customer->IsActive) {
+        $customer = $customerController->getCustomerById($customerId);
+        if (!password_verify($password, $customer->Password)) {
+            $_SESSION['SignInErrorMessage'] = 'Mật khẩu không đúng.';
+            header('Location: sign_in.php');
+            exit();
+        } else if (!$customer->IsActive) {
             $_SESSION['temp_error'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.';
             header('Location: access_denied.php');
             exit();
@@ -230,9 +237,9 @@ if (isset($_POST['SignIn'])) {
         <?php endif; ?>
 
         <form method="post" action="">
-            <?php if (!empty($errors)): ?>
+            <?php if (!empty($signInErrorMessage)): ?>
                 <div class="alert alert-danger alert-dismissible fade show">
-                    <?php foreach ($errors as $error) echo "<p class='mb-1'>$error</p>"; ?>
+                    <strong><?= htmlspecialchars($signInErrorMessage) ?></strong>
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             <?php endif; ?>

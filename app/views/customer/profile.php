@@ -1,42 +1,50 @@
 <?php
-    session_start();
-    include '../../controllers/CustomerController.php';
+session_start();
+if (!isset($_SESSION['CustomerId']) || empty($_SESSION['CustomerId'])) {
+    header("Location: sign_in.php");
+    exit();
+}
 
-    $success = $_SESSION['ProfileSuccessMessage'] ?? '';
-    $error   = $_SESSION['ProfileErrorMessage'] ?? '';
-    unset($_SESSION['ProfileSuccessMessage'], $_SESSION['ProfileErrorMessage']);
+include '../../controllers/CustomerController.php';
 
-    $customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
-    $customerController = new CustomerController();
-    $customer = $customerController->getCustomerById($customerId);    
+$success = $_SESSION['ProfileSuccessMessage'] ?? '';
+$error   = $_SESSION['ProfileErrorMessage'] ?? '';
+unset($_SESSION['ProfileSuccessMessage'], $_SESSION['ProfileErrorMessage']);
 
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
-        $customer->Id = $customerId;
-        $customer->FirstName = trim($_POST['FirstName']);
-        $customer->LastName = trim($_POST['LastName']);
-        $customer->Phone = trim($_POST['Phone']);
-        $customer->DateOfBirth = $_POST['DateOfBirth'];
-        $customer->Address = trim($_POST['Address']);
+$customerId = isset($_SESSION['CustomerId']) ? $_SESSION['CustomerId'] : null;
+$customerController = new CustomerController();
+$customer = $customerController->getCustomerById($customerId);
 
-        if (isset($_FILES['ImgUpload']) && $_FILES['ImgUpload']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = __DIR__ . '/../../img/KhachHang/' . md5(trim($customer->Email)) . '/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $file_name = 'avatar_' . time() . '.' . pathinfo($_FILES['ImgUpload']['name'], PATHINFO_EXTENSION);
-            $uploadedFile = $uploadDir . $file_name;
-            if (move_uploaded_file($_FILES['ImgUpload']['tmp_name'], $uploadedFile)) {
-                $customer->Img = $file_name;
-            }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ChangeButton'])) {
+    $customer->Id = $customerId;
+    $customer->FirstName = trim($_POST['FirstName']);
+    $customer->LastName = trim($_POST['LastName']);
+    $customer->Phone = trim($_POST['Phone']);
+    $customer->DateOfBirth = $_POST['DateOfBirth'];
+    $customer->Address = trim($_POST['Address']);
+    $customer->Email = trim($_POST['Email']); // Thêm dòng này để đảm bảo Email được giữ nguyên
+
+    if (isset($_FILES['ImgUpload']) && $_FILES['ImgUpload']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../../img/KhachHang/' . md5(trim($customer->Email)) . '/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
         }
-
-        $updateResult = $customerController->updateCustomer($customer);
-        if ($updateResult) {
-            $_SESSION['ProfileSuccessMessage'] = 'Cập nhật thông tin cá nhân thành công.';
-        } else {
-            $_SESSION['ProfileErrorMessage'] = 'Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.';
+        $file_name = 'avatar_' . time() . '.' . pathinfo($_FILES['ImgUpload']['name'], PATHINFO_EXTENSION);
+        $uploadedFile = $uploadDir . $file_name;
+        if (move_uploaded_file($_FILES['ImgUpload']['tmp_name'], $uploadedFile)) {
+            $customer->Img = $file_name;
         }
     }
+
+    $updateResult = $customerController->updateCustomer($customer);
+    if ($updateResult) {
+        $_SESSION['ProfileSuccessMessage'] = 'Cập nhật thông tin cá nhân thành công.';
+    } else {
+        $_SESSION['ProfileErrorMessage'] = 'Cập nhật thông tin cá nhân thất bại. Vui lòng thử lại.';
+    }
+    header("Location: profile.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -128,7 +136,6 @@
             color: white;
         }
 
-        /* Gạch nhỏ trang trí phía dưới header */
         .page-header::after {
             content: "";
             width: 80px;
@@ -228,11 +235,15 @@
             background: var(--primary-hover);
             transform: translateY(-5px);
         }
+
+        #avatarChangeBtn {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <?php include '../header.php';?>
+    <?php include '../header.php'; ?>
     <!-- Header -->
     <div class="container-fluid page-header">
         <h1 class="display-4 fw-bold">Thông tin cá nhân</h1>
@@ -277,16 +288,16 @@
                             <!-- Avatar + Nút hành động -->
                             <div class="col-lg-5 text-center">
                                 <div class="avatar-wrapper">
-                                    <?php if($customer->Img ===  'avatar-default.png'): ?>
+                                    <?php if ($customer->Img ===  'avatar-default.png'): ?>
                                         <img src="../../img/KhachHang/avatar-default.png" alt="Avatar" class="avatar-img" id="image_preview">
-                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                        <label class="avatar-overlay" id="avatarChangeBtn" title="Đổi ảnh đại diện" for="image_upload">
                                             <i class="fas fa-camera fa-lg"></i>
                                             <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
                                         </label>
                                     <?php else: ?>
                                         <img src="../../img/KhachHang/<?= md5(trim($customer->Email)) . '/' . $customer->Img ?>"
                                             alt="Avatar" class="avatar-img" id="image_preview">
-                                        <label class="avatar-overlay" title="Đổi ảnh đại diện">
+                                        <label class="avatar-overlay" id="avatarChangeBtn" title="Đổi ảnh đại diện" for="image_upload">
                                             <i class="fas fa-camera fa-lg"></i>
                                             <input type="file" name="ImgUpload" id="image_upload" accept="image/*" style="display:none;">
                                         </label>
@@ -294,7 +305,7 @@
                                 </div>
                                 <input type="hidden" name="Img" value="<?= htmlspecialchars($customer->Img) ?>">
 
-                                <div class="mt-4 d-grid d-md-flex justify-content-center gap-3">
+                                <div class="mt-4 d-grid d-md-flex justify-content-center gap-3" id="accountButtons">
                                     <a href="change_password.php" class="btn btn-outline-primary">
                                         <i class="fas fa-key me-2"></i>Đổi mật khẩu
                                     </a>
@@ -303,7 +314,7 @@
                                     </a>
                                 </div>
 
-                                <div class="mt-4 text-center">
+                                <div class="mt-4 text-center" id="orderButton">
                                     <a href="../payment/index.php" class="btn btn-primary btn-lg px-5">
                                         <i class="fas fa-shopping-bag me-2"></i>Xem đơn hàng
                                     </a>
@@ -377,18 +388,26 @@
         const btnEdit = document.getElementById('btnEdit');
         const btnCancel = document.getElementById('btnCancel');
         const actionButtons = document.getElementById('actionButtons');
-        const formInputs = document.querySelectorAll('#profileForm input[name]:not([type="file"]):not([type="hidden"])');
+        const formInputs = document.querySelectorAll('#profileForm input[name]:not([type="file"]):not([type="hidden"]):not([name="Email"])');
+        const avatarChangeBtn = document.getElementById('avatarChangeBtn');
+        const accountButtons = document.getElementById('accountButtons');
+        const orderButton = document.getElementById('orderButton');
 
-        // Bật chế độ chỉnh sửa
         btnEdit.addEventListener('click', function() {
             formInputs.forEach(input => {
-                if (input.name !== 'Email') { // Email thường không cho sửa
-                    input.removeAttribute('readonly');
-                }
-                input.classList.remove('bg-light');
+                input.removeAttribute('readonly');
             });
 
+            // Hiện icon đổi ảnh
+            avatarChangeBtn.style.display = 'flex';
+
+            // Ẩn nút đăng xuất và đổi mật khẩu
+            accountButtons.style.display = 'none';
+
+            // Hiện nút Lưu / Hủy
             actionButtons.style.display = 'block';
+
+            // Ẩn nút chỉnh sửa
             btnEdit.style.display = 'none';
         });
 
