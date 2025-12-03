@@ -244,10 +244,11 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, 260px);
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 30px;
             justify-content: center;
         }
+
 
         .card {
             background: white;
@@ -256,6 +257,11 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
             position: relative;
+
+            max-width: 300px;
+            /* giới hạn độ rộng tối đa */
+            /* margin: 0 auto; */
+            /* căn giữa khi ít sản phẩm */
         }
 
         .card:hover {
@@ -773,21 +779,35 @@ $customerId = $_SESSION['CustomerId'] ?? 0;
             loadProducts();
         });
 
-        function loadProducts() {
+        let currentPage = 1;
+
+        function loadProducts(page = 1) {
             if (selectedStore == 0) return;
 
+            currentPage = page;
+
             const xhr = new XMLHttpRequest();
-            const params = `store=${selectedStore}&category=${selectedCategory}&searchString=${encodeURIComponent(searchString)}&sort=${sortValue}`;
+            const params = `store=${selectedStore}&category=${selectedCategory}&searchString=${encodeURIComponent(searchString)}&sort=${sortValue}&page=${currentPage}`;
             xhr.open('GET', `get_products.php?${params}`, true);
             xhr.onload = function() {
                 if (this.status === 200) {
                     document.getElementById('productsGrid').innerHTML = this.responseText;
+
+                    // Bắt sự kiện click cho các link phân trang
+                    document.querySelectorAll('.pagination a.page-link').forEach(link => {
+                        link.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const page = parseInt(this.dataset.page);
+                            loadProducts(page);
+                        });
+                    });
                 } else {
                     document.getElementById('productsGrid').innerHTML = '<p>Không thể load sản phẩm.</p>';
                 }
             };
             xhr.send();
         }
+
         document.getElementById('productsGrid').addEventListener('click', function(e) {
             if (e.target.classList.contains('add_to_cart')) {
                 const btn = e.target;
