@@ -1,3 +1,31 @@
+<?php
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['CustomerId'])) {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    require_once __DIR__ . '/../../../controllers/CustomerController.php';
+    $customerController = new CustomerController();
+
+    $customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+    $employeeAdmins = [];
+
+    if ($customer && $customer->Role) {
+        require_once __DIR__ . '/../../controllers/EmployeeAdminController.php'; 
+
+        $employeeAdminController = new EmployeeAdminController();
+        $employeeAdmins = $employeeAdminController->getAllEmployees();
+    } else {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    $employeesJson = json_encode($employeeAdmins, JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -84,36 +112,30 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Demo row -->
-                        <tr>
-                            <td>1</td>
-                            <td>Nguyễn Văn A</td>
-                            <td>101</td>
-                            <td>2</td>
-                            <td>15,000,000</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Trần Thị B</td>
-                            <td>102</td>
-                            <td>1</td>
-                            <td>12,500,000</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
+                        <?php if (!empty($employeeAdmins)): ?>
+                            <?php foreach($employeeAdmins as $employee): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($employee->Id); ?></td>
+                                    <td><?php echo htmlspecialchars($employee->Name); ?></td>
+                                    <td><?php echo htmlspecialchars($employee->StoreId); ?></td>
+                                    <td><?php echo htmlspecialchars($employee->RoleId); ?></td>
+                                    <td><?php echo number_format($employee->Salary, 0, ',', '.'); ?></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-id="<?php echo $employee->Id; ?>"><i class="fa fa-edit"></i>Sửa</button>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-id="<?php echo $employee->Id; ?>"><i class="fa fa-eye"></i>Chi tiết</button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="<?php echo $employee->Id; ?>" data-bs-name="<?php echo htmlspecialchars($employee->Name); ?>"><i class="fa fa-trash"></i>Xóa</button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" class="text-center">Không có nhân viên nào được tìm thấy.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Phân trang -->
             <div class="d-flex justify-content-center mt-4">
                 <button class="btn btn-outline-dark mx-1">&laquo;</button>
                 <button class="btn btn-outline-dark active mx-1">1</button>
@@ -124,30 +146,29 @@
         </div>
     </div>
 
-    <!-- Create Modal -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_create_employee.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm nhân viên mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Họ và tênh</label>
-                        <input type="text" class="form-control" placeholder="Nhập họ tên nhân viên">
+                        <label for="create-name">Họ và tên</label>
+                        <input type="text" class="form-control" id="create-name" name="Name" placeholder="Nhập họ tên nhân viên" required>
                     </div>
                     <div class="mb-3">
-                        <label>Mã cửa hàng</label>
-                        <input type="number" class="form-control" placeholder="Nhập StoreId">
+                        <label for="create-storeid">Mã cửa hàng</label>
+                        <input type="number" class="form-control" id="create-storeid" name="StoreId" placeholder="Nhập StoreId" required>
                     </div>
                     <div class="mb-3">
-                        <label>Mã chức vụ</label>
-                        <input type="number" class="form-control" placeholder="Nhập RoleId">
+                        <label for="create-roleid">Mã chức vụ</label>
+                        <input type="number" class="form-control" id="create-roleid" name="RoleId" placeholder="Nhập RoleId" required>
                     </div>
                     <div class="mb-3">
-                        <label>Lương</label>
-                        <input type="text" class="form-control" placeholder="Nhập lương">
+                        <label for="create-salary">Lương</label>
+                        <input type="number" class="form-control" id="create-salary" name="Salary" placeholder="Nhập lương (VD: 15000000)" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -158,30 +179,30 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_edit_employee.php">
+                <input type="hidden" name="EmployeeId" id="edit-employee-id">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa nhân viên</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Họ và tên</label>
-                        <input type="text" class="form-control" value="Nguyễn Văn A">
+                        <label for="edit-name">Họ và tên</label>
+                        <input type="text" class="form-control" id="edit-name" name="Name" required>
                     </div>
                     <div class="mb-3">
-                        <label>Mã cửa hàng</label>
-                        <input type="number" class="form-control" value="101">
+                        <label for="edit-storeid">Mã cửa hàng</label>
+                        <input type="number" class="form-control" id="edit-storeid" name="StoreId" required>
                     </div>
                     <div class="mb-3">
-                        <label>Mã chức vụ</label>
-                        <input type="number" class="form-control" value="2">
+                        <label for="edit-roleid">Mã chức vụ</label>
+                        <input type="number" class="form-control" id="edit-roleid" name="RoleId" required>
                     </div>
                     <div class="mb-3">
-                        <label>Lương</label>
-                        <input type="text" class="form-control" value="15,000,000">
+                        <label for="edit-salary">Lương</label>
+                        <input type="number" class="form-control" id="edit-salary" name="Salary" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -192,7 +213,6 @@
         </div>
     </div>
 
-    <!-- View Modal -->
     <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -201,10 +221,11 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Họ và tên:</strong> Nguyễn Văn A</p>
-                    <p><strong>Mã cửa hàng:</strong> 101</p>
-                    <p><strong>Mã chức vụ:</strong> 2</p>
-                    <p><strong>Lương:</strong> 15,000,000</p>
+                    <p><strong>Mã nhân viên:</strong> <span id="view-id"></span></p>
+                    <p><strong>Họ và tên:</strong> <span id="view-name"></span></p>
+                    <p><strong>Mã cửa hàng:</strong> <span id="view-storeid"></span></p>
+                    <p><strong>Mã chức vụ:</strong> <span id="view-roleid"></span></p>
+                    <p><strong>Lương:</strong> <span id="view-salary"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -213,7 +234,6 @@
         </div>
     </div>
 
-    <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -222,17 +242,70 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa nhân viên này không?
+                    Bạn có chắc chắn muốn xóa nhân viên **<span id="delete-employee-name-display" class="fw-bold"></span>** (Mã NV: <span id="delete-employee-id-display"></span>) này không?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
+                    <a id="confirmDeleteLink" class="btn btn-danger" href="#">Xóa</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const employeesData = <?php echo $employeesJson; ?>;
+
+        function formatSalary(number) {
+            return new Intl.NumberFormat('vi-VN').format(number);
+        }
+
+        const viewModal = document.getElementById('viewModal');
+        const editModal = document.getElementById('editModal');
+        const deleteModal = document.getElementById('deleteModal');
+
+        const modalElements = [viewModal, editModal, deleteModal];
+
+        modalElements.forEach(modalElement => {
+            modalElement.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; 
+                const employeeId = button ? button.getAttribute('data-bs-id') : null;
+                
+                if (employeeId) {
+                    const employee = employeesData.find(e => e.Id == employeeId);
+
+                    if (!employee) {
+                        console.error('Không tìm thấy nhân viên với ID:', employeeId);
+                        return;
+                    }
+
+                    if (modalElement.id === 'viewModal') {
+                        document.getElementById('view-id').innerText = employee.Id;
+                        document.getElementById('view-name').innerText = employee.Name;
+                        document.getElementById('view-storeid').innerText = employee.StoreId;
+                        document.getElementById('view-roleid').innerText = employee.RoleId;
+                        document.getElementById('view-salary').innerText = formatSalary(employee.Salary);
+                    }
+
+                    if (modalElement.id === 'editModal') {
+                        document.getElementById('edit-employee-id').value = employee.Id;
+                        document.getElementById('edit-name').value = employee.Name;
+                        document.getElementById('edit-storeid').value = employee.StoreId;
+                        document.getElementById('edit-roleid').value = employee.RoleId;
+                        document.getElementById('edit-salary').value = employee.Salary; 
+                    }
+
+                    if (modalElement.id === 'deleteModal') {
+                        const employeeName = button.getAttribute('data-bs-name');
+                        document.getElementById('delete-employee-id-display').innerText = employee.Id;
+                        document.getElementById('delete-employee-name-display').innerText = employeeName;
+                        document.getElementById('confirmDeleteLink').href = 'process_delete_employee.php?id=' + employee.Id;
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

@@ -19,7 +19,6 @@
 
         $customerAdminController = new CustomerAdminController();
         $customerAdmins = $customerAdminController->getAllCustomers();
-
     } else {
         header('Location: ../../../views/home/index.php');
         exit();
@@ -326,7 +325,7 @@
     <script>
         const customersData = <?php echo $customersJson; ?>;
 
-        const IMG_BASE_PATH = '/oss_trung_nguyen_coffee/app/img/Avatar/';
+        const IMG_BASE_PATH = '/oss_trung_nguyen_coffee/app/img/KhachHang/';
 
         function formatDate(dateString) {
             const date = new Date(dateString);

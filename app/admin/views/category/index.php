@@ -141,7 +141,7 @@
 
     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content" method="POST" action="process_create_category.php">
+            <form class="modal-content" method="POST" action="create.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm danh mục mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -166,7 +166,7 @@
 
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content" method="POST" action="process_edit_category.php">
+            <form class="modal-content" method="POST" action="update.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa danh mục</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>

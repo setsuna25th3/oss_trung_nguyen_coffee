@@ -1,3 +1,31 @@
+<?php
+    if (session_status() == PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (!isset($_SESSION['CustomerId'])) {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    require_once __DIR__ . '/../../../controllers/CustomerController.php';
+    $customerController = new CustomerController();
+
+    $customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+    $storeAdmins = [];
+
+    if ($customer && $customer->Role) {
+        require_once __DIR__ . '/../../controllers/StoreAdminController.php'; 
+
+        $storeAdminController = new StoreAdminController();
+        $storeAdmins = $storeAdminController->getAllStores();
+    } else {
+        header('Location: ../../../views/home/index.php');
+        exit();
+    }
+
+    $storesJson = json_encode($storeAdmins, JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -85,38 +113,37 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dữ liệu mẫu -->
-                        <tr>
-                            <td>1</td>
-                            <td>Cửa hàng Trung Nguyên 1</td>
-                            <td>123 Lê Lợi, TP.HCM</td>
-                            <td>0123456789</td>
-                            <td>07:00</td>
-                            <td>22:00</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Cửa hàng Trung Nguyên 2</td>
-                            <td>456 Hai Bà Trưng, Hà Nội</td>
-                            <td>0987654321</td>
-                            <td>08:00</td>
-                            <td>21:00</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
+                        <?php if (!empty($storeAdmins)): ?>
+                            <?php foreach($storeAdmins as $store): ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($store->Id); ?></td>
+                                    <td><?php echo htmlspecialchars($store->StoreName); ?></td>
+                                    <td><?php echo htmlspecialchars($store->Address); ?></td>
+                                    <td><?php echo htmlspecialchars($store->Phone); ?></td>
+                                    <td><?php echo htmlspecialchars($store->OpenTime); ?></td>
+                                    <td><?php echo htmlspecialchars($store->CloseTime); ?></td>
+                                    <td>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-id="<?php echo $store->Id; ?>">
+                                            <i class="fa fa-edit"></i>Sửa
+                                        </button>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-id="<?php echo $store->Id; ?>">
+                                            <i class="fa fa-eye"></i>Chi tiết
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="<?php echo $store->Id; ?>" data-bs-name="<?php echo htmlspecialchars($store->StoreName); ?>">
+                                            <i class="fa fa-trash"></i>Xóa
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7" class="text-center">Không có cửa hàng nào được tìm thấy.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Phân trang -->
             <div class="d-flex justify-content-center mt-4">
                 <button class="btn btn-outline-dark mx-1">&laquo;</button>
                 <button class="btn btn-outline-dark active mx-1">1</button>
@@ -127,34 +154,33 @@
         </div>
     </div>
 
-    <!-- Create Modal -->
     <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_create_store.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm cửa hàng mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Tên cửa hàng</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên cửa hàng">
+                        <label for="create-storename">Tên cửa hàng</label>
+                        <input type="text" class="form-control" id="create-storename" name="StoreName" placeholder="Nhập tên cửa hàng" required>
                     </div>
                     <div class="mb-3">
-                        <label>Địa chỉ</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa chỉ">
+                        <label for="create-address">Địa chỉ</label>
+                        <input type="text" class="form-control" id="create-address" name="Address" placeholder="Nhập địa chỉ" required>
                     </div>
                     <div class="mb-3">
-                        <label>Điện thoại</label>
-                        <input type="text" class="form-control" placeholder="Nhập số điện thoại">
+                        <label for="create-phone">Điện thoại</label>
+                        <input type="text" class="form-control" id="create-phone" name="Phone" placeholder="Nhập số điện thoại" required>
                     </div>
                     <div class="mb-3">
-                        <label>Giờ mở cửa</label>
-                        <input type="text" class="form-control" placeholder="Nhập giờ mở cửa">
+                        <label for="create-opentime">Giờ mở cửa</label>
+                        <input type="time" class="form-control" id="create-opentime" name="OpenTime" required>
                     </div>
                     <div class="mb-3">
-                        <label>Giờ đóng cửa</label>
-                        <input type="text" class="form-control" placeholder="Nhập giờ đóng cửa">
+                        <label for="create-closetime">Giờ đóng cửa</label>
+                        <input type="time" class="form-control" id="create-closetime" name="CloseTime" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -165,34 +191,34 @@
         </div>
     </div>
 
-    <!-- Edit Modal -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_edit_store.php">
+                <input type="hidden" name="StoreId" id="edit-store-id">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa cửa hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label>Tên cửa hàng</label>
-                        <input type="text" class="form-control" value="Cửa hàng Trung Nguyên 1">
+                        <label for="edit-storename">Tên cửa hàng</label>
+                        <input type="text" class="form-control" id="edit-storename" name="StoreName" required>
                     </div>
                     <div class="mb-3">
-                        <label>Địa chỉ</label>
-                        <input type="text" class="form-control" value="123 Lê Lợi, TP.HCM">
+                        <label for="edit-address">Địa chỉ</label>
+                        <input type="text" class="form-control" id="edit-address" name="Address" required>
                     </div>
                     <div class="mb-3">
-                        <label>Điện thoại</label>
-                        <input type="text" class="form-control" value="0123456789">
+                        <label for="edit-phone">Điện thoại</label>
+                        <input type="text" class="form-control" id="edit-phone" name="Phone" required>
                     </div>
                     <div class="mb-3">
-                        <label>Giờ mở cửa</label>
-                        <input type="text" class="form-control" value="07:00">
+                        <label for="edit-opentime">Giờ mở cửa</label>
+                        <input type="time" class="form-control" id="edit-opentime" name="OpenTime" required>
                     </div>
                     <div class="mb-3">
-                        <label>Giờ đóng cửa</label>
-                        <input type="text" class="form-control" value="22:00">
+                        <label for="edit-closetime">Giờ đóng cửa</label>
+                        <input type="time" class="form-control" id="edit-closetime" name="CloseTime" required>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -203,7 +229,6 @@
         </div>
     </div>
 
-    <!-- View Modal -->
     <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -212,11 +237,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Tên cửa hàng:</strong> Cửa hàng Trung Nguyên 1</p>
-                    <p><strong>Địa chỉ:</strong> 123 Lê Lợi, TP.HCM</p>
-                    <p><strong>Điện thoại:</strong> 0123456789</p>
-                    <p><strong>Giờ mở cửa:</strong> 07:00</p>
-                    <p><strong>Giờ đóng cửa:</strong> 22:00</p>
+                    <p><strong>Mã cửa hàng:</strong> <span id="view-id"></span></p>
+                    <p><strong>Tên cửa hàng:</strong> <span id="view-storename"></span></p>
+                    <p><strong>Địa chỉ:</strong> <span id="view-address"></span></p>
+                    <p><strong>Điện thoại:</strong> <span id="view-phone"></span></p>
+                    <p><strong>Giờ mở cửa:</strong> <span id="view-opentime"></span></p>
+                    <p><strong>Giờ đóng cửa:</strong> <span id="view-closetime"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -225,7 +251,6 @@
         </div>
     </div>
 
-    <!-- Delete Modal -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -234,17 +259,68 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa cửa hàng này không?
+                    Bạn có chắc chắn muốn xóa cửa hàng **<span id="delete-store-name-display" class="fw-bold"></span>** (Mã: <span id="delete-store-id-display"></span>) này không?
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
+                    <a id="confirmDeleteLink" class="btn btn-danger" href="#">Xóa</a>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const storesData = <?php echo $storesJson; ?>;
+
+        const viewModal = document.getElementById('viewModal');
+        const editModal = document.getElementById('editModal');
+        const deleteModal = document.getElementById('deleteModal');
+
+        const modalElements = [viewModal, editModal, deleteModal];
+
+        modalElements.forEach(modalElement => {
+            modalElement.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget; 
+                const storeId = button ? button.getAttribute('data-bs-id') : null;
+                
+                if (storeId) {
+                    const store = storesData.find(s => s.Id == storeId);
+
+                    if (!store) {
+                        console.error('Không tìm thấy cửa hàng với ID:', storeId);
+                        return;
+                    }
+
+                    if (modalElement.id === 'viewModal') {
+                        document.getElementById('view-id').innerText = store.Id;
+                        document.getElementById('view-storename').innerText = store.StoreName;
+                        document.getElementById('view-address').innerText = store.Address;
+                        document.getElementById('view-phone').innerText = store.Phone;
+                        document.getElementById('view-opentime').innerText = store.OpenTime;
+                        document.getElementById('view-closetime').innerText = store.CloseTime;
+                    }
+
+                    if (modalElement.id === 'editModal') {
+                        document.getElementById('edit-store-id').value = store.Id;
+                        document.getElementById('edit-storename').value = store.StoreName;
+                        document.getElementById('edit-address').value = store.Address;
+                        document.getElementById('edit-phone').value = store.Phone;
+                        document.getElementById('edit-opentime').value = store.OpenTime;
+                        document.getElementById('edit-closetime').value = store.CloseTime;
+                    }
+
+                    if (modalElement.id === 'deleteModal') {
+                        const storeName = button.getAttribute('data-bs-name');
+                        document.getElementById('delete-store-id-display').innerText = store.Id;
+                        document.getElementById('delete-store-name-display').innerText = storeName;
+                        document.getElementById('confirmDeleteLink').href = 'process_delete_store.php?id=' + store.Id;
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

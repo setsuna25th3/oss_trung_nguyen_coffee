@@ -1,19 +1,19 @@
 <?php
     require_once __DIR__ .'/../../config/env.php';
-    require_once __DIR__ .'/../admin/models/EmployeeAdmin.php';
+    require_once __DIR__ .'/../models/EmployeeAdmin.php';
 
     class EmployeeAdminController {
         public function getAllEmployees(){
             global $hostname, $username, $password, $dbname, $port;
             $db = new mysqli($hostname, $username, $password, $dbname, $port);
-            $sql = "SELECT Id, Name, StoreId, RoleId, Salary FROM employee";
+            $sql = "SELECT * FROM employee";
             $result = $db->query($sql);
             $employees = [];
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $employee = new EmployeeAdmin();
                     $employee->Id = $row['Id'];
-                    $employee->Name = $row['Name'];
+                    $employee->Name = $row['FullName'];
                     $employee->StoreId = $row['StoreId'];
                     $employee->RoleId = $row['RoleId'];
                     $employee->Salary = $row['Salary'];
@@ -54,7 +54,7 @@
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
                 $employee->Id = $row['Id'];
-                $employee->Name = $row['Name'];
+                $employee->Name = $row['FullName'];
                 $employee->StoreId = $row['StoreId'];
                 $employee->RoleId = $row['RoleId'];
                 $employee->Salary = $row['Salary'];
