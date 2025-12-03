@@ -38,6 +38,8 @@ foreach ($stores as $store) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Giỏ hàng - Trung Nguyên Cà Phê</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-p1CmGhqPj4sA2Z3h2y+7y/YQq/1B82Jm3cLzU8/U5p8C1xPGGh8gZsyD+36ZhRZc3/1cqKJ4JzjCe2o6ULYtCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
     <style>
         * {
             margin: 0;
@@ -311,6 +313,17 @@ foreach ($stores as $store) {
             <li class="active">Giỏ hàng</li>
         </ul>
     </div>
+    <?php if (isset($_SESSION['CustomerId']) && $_SESSION['CustomerId'] > 0): ?>
+        <div class="order-icon-container" style="text-align: right; margin: 20px 50px;">
+            <a href="../payment/index.php"
+                style="font-size: 28px; text-decoration: none; color: #37474f; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-box"></i>
+                <span>Đơn hàng</span>
+            </a>
+        </div>
+
+    <?php endif; ?>
+
 
     <div class="container">
         <main class="main-content">
