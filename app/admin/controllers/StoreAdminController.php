@@ -1,6 +1,6 @@
 <?php
-    include __DIR__ .'/../../env.php';
-    include __DIR__ .'/../models/StoreAdmin.php';
+    require_once __DIR__ .'/../../config/env.php';
+    require_once __DIR__ .'/../models/StoreAdmin.php';
 
     class StoreAdminController {
         public function getAllStores(){

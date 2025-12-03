@@ -1,6 +1,6 @@
 <?php
     if (!class_exists('ProductController')) {
-        require_once __DIR__ .'/../env.php';
+        require_once __DIR__ .'/../config/env.php';
         require_once __DIR__ .'/../models/Product.php';
 
         class ProductController {

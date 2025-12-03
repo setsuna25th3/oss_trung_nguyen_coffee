@@ -65,23 +65,28 @@
             $_SESSION['SignUpErrorMessage'] = 'Email đã tồn tại. Vui lòng sử dụng email khác.';
         }
         else{
-            if (!password_verify($confirmPass, $customer->Password)){
-                $_SESSION['SignUpErrorMessage'] = 'Mật khẩu xác nhận không đúng.';
+            if(strlen($customer->Password) < 6){
+                $_SESSION['SignUpErrorMessage'] = 'Mật khẩu phải đủ 6 kí tự.';
             }
             else{
-                $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
-                if ($img_path === false){
-                    $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại do lỗi tải ảnh. Vui lòng thử lại.';
+                if (!password_verify($confirmPass, $customer->Password)){
+                    $_SESSION['SignUpErrorMessage'] = 'Mật khẩu xác nhận không đúng.';
                 }
                 else{
-                    $customer->Img = $img_path;
-                    $isSuccess = $customerController->signUp($customer);
-                    if ($isSuccess) {
-                        $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
-                        header('Location: sign_in.php');
-                        exit();
-                    } else {
-                        $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
+                    $img_path = uploadImage($UPLOAD_DIR, $customer->Email);
+                    if ($img_path === false){
+                        $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại do lỗi tải ảnh. Vui lòng thử lại.';
+                    }
+                    else{
+                        $customer->Img = $img_path;
+                        $isSuccess = $customerController->signUp($customer);
+                        if ($isSuccess) {
+                            $_SESSION['SignUpSuccessMessage'] = 'Đăng ký thành công!';
+                            header('Location: sign_in.php');
+                            exit();
+                        } else {
+                            $_SESSION['SignUpErrorMessage'] = 'Đăng ký thất bại. Vui lòng thử lại.';
+                        }
                     }
                 }
             }
@@ -353,14 +358,6 @@
 
             <div class="text-center mt-3">
                 Đã có tài khoản? <a href="sign_in.php">Đăng nhập</a>
-            </div>
-
-            <div class="text-center mt-3">
-                <p>Hoặc đăng ký với:</p>
-                <button type="button" class="btn btn-outline-facebook social-btn"><i class="fab fa-facebook-f"></i></button>
-                <button type="button" class="btn btn-outline-google social-btn"><i class="fab fa-google"></i></button>
-                <button type="button" class="btn btn-outline-twitter social-btn"><i class="fab fa-twitter"></i></button>
-                <button type="button" class="btn btn-outline-github social-btn"><i class="fab fa-github"></i></button>
             </div>
         </form>
     </div>

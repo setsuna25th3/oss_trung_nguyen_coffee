@@ -263,7 +263,7 @@
                                 <input class="form-check-input" type="checkbox" name="rememberMe" id="rememberMe">
                                 <label class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
                             </div>
-                            <a href="../customer/forgotpassword.php" class="forgot-link">Quên mật khẩu?</a>
+                            <a href="forgot_password.php" class="forgot-link">Quên mật khẩu?</a>
                         </div>
                     </td>
                 </tr>
@@ -274,14 +274,6 @@
 
             <div class="text-center mt-3">
                 Chưa có tài khoản? <a href="../customer/sign_up.php">Đăng ký</a>
-            </div>
-
-            <div class="text-center mt-3">
-                <p>Hoặc đăng nhập với:</p>
-                <button type="button" class="btn btn-outline-facebook social-btn"><i class="fab fa-facebook-f"></i></button>
-                <button type="button" class="btn btn-outline-google social-btn"><i class="fab fa-google"></i></button>
-                <button type="button" class="btn btn-outline-twitter social-btn"><i class="fab fa-twitter"></i></button>
-                <button type="button" class="btn btn-outline-github social-btn"><i class="fab fa-github"></i></button>
             </div>
         </form>
     </div>
