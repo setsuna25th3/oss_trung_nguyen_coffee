@@ -1,3 +1,31 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Kiểm tra quyền admin
+if (!isset($_SESSION['CustomerId'])) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
+
+require_once __DIR__ . '/../../../controllers/CustomerController.php';
+require_once __DIR__ . '/../../models/StoreAdmin.php';
+require_once __DIR__ . '/../../controllers/StoreAdminController.php';
+
+$customerController = new CustomerController();
+$customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+
+if (!$customer || !$customer->Role) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
+
+$storeController = new StoreAdminController();
+$stores = $storeController->getAllStores();
+$storesJson = json_encode($stores, JSON_UNESCAPED_UNICODE);
+?>
+
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -52,6 +80,18 @@
                 overflow-x: auto;
             }
         }
+
+        .modal-backdrop-white {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+            width: 100vw;
+            height: 100vh;
+            background-color: #fff;
+            opacity: 0.8;
+            transition: opacity 0.15s linear;
+        }
     </style>
 </head>
 
@@ -62,7 +102,7 @@
         <div class="table-wrapper">
             <div class="d-flex justify-content-between mb-3">
                 <button class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#createModal">
-                    <i class="fa fa-plus"></i> Thêm cửa hàng mới
+                    <i class="fa fa-plus"></i> Thêm cửa hàng
                 </button>
                 <div class="d-flex">
                     <input type="text" class="form-control me-2" placeholder="Tìm kiếm cửa hàng...">
@@ -85,77 +125,47 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dữ liệu mẫu -->
-                        <tr>
-                            <td>1</td>
-                            <td>Cửa hàng Trung Nguyên 1</td>
-                            <td>123 Lê Lợi, TP.HCM</td>
-                            <td>0123456789</td>
-                            <td>07:00</td>
-                            <td>22:00</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Cửa hàng Trung Nguyên 2</td>
-                            <td>456 Hai Bà Trưng, Hà Nội</td>
-                            <td>0987654321</td>
-                            <td>08:00</td>
-                            <td>21:00</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal"><i class="fa fa-edit"></i>Sửa</button>
-                                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal"><i class="fa fa-eye"></i>Chi tiết</button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal"><i class="fa fa-trash"></i>Xóa</button>
-                            </td>
-                        </tr>
+                        <?php if (!empty($stores)): ?>
+                            <?php foreach ($stores as $store): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($store->Id) ?></td>
+                                    <td><?= htmlspecialchars($store->StoreName) ?></td>
+                                    <td><?= htmlspecialchars($store->Address) ?></td>
+                                    <td><?= htmlspecialchars($store->Phone) ?></td>
+                                    <td><?= htmlspecialchars($store->OpenTime) ?></td>
+                                    <td><?= htmlspecialchars($store->CloseTime) ?></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-id="<?= $store->Id ?>"><i class="fa fa-eye"></i></button>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-id="<?= $store->Id ?>"><i class="fa fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="<?= $store->Id ?>"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="7" class="text-center">Không có cửa hàng nào.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Phân trang -->
-            <div class="d-flex justify-content-center mt-4">
-                <button class="btn btn-outline-dark mx-1">&laquo;</button>
-                <button class="btn btn-outline-dark active mx-1">1</button>
-                <button class="btn btn-outline-dark mx-1">2</button>
-                <button class="btn btn-outline-dark mx-1">3</button>
-                <button class="btn btn-outline-dark mx-1">&raquo;</button>
             </div>
         </div>
     </div>
 
     <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_create.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm cửa hàng mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Tên cửa hàng</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên cửa hàng">
-                    </div>
-                    <div class="mb-3">
-                        <label>Địa chỉ</label>
-                        <input type="text" class="form-control" placeholder="Nhập địa chỉ">
-                    </div>
-                    <div class="mb-3">
-                        <label>Điện thoại</label>
-                        <input type="text" class="form-control" placeholder="Nhập số điện thoại">
-                    </div>
-                    <div class="mb-3">
-                        <label>Giờ mở cửa</label>
-                        <input type="text" class="form-control" placeholder="Nhập giờ mở cửa">
-                    </div>
-                    <div class="mb-3">
-                        <label>Giờ đóng cửa</label>
-                        <input type="text" class="form-control" placeholder="Nhập giờ đóng cửa">
-                    </div>
+                    <div class="mb-3"><label>Tên cửa hàng</label><input type="text" class="form-control" name="StoreName"></div>
+                    <div class="mb-3"><label>Địa chỉ</label><input type="text" class="form-control" name="Address"></div>
+                    <div class="mb-3"><label>Điện thoại</label><input type="text" class="form-control" name="Phone"></div>
+                    <div class="mb-3"><label>Giờ mở cửa</label><input type="text" class="form-control" name="OpenTime"></div>
+                    <div class="mb-3"><label>Giờ đóng cửa</label><input type="text" class="form-control" name="CloseTime"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -166,34 +176,20 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_edit.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa cửa hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Tên cửa hàng</label>
-                        <input type="text" class="form-control" value="Cửa hàng Trung Nguyên 1">
-                    </div>
-                    <div class="mb-3">
-                        <label>Địa chỉ</label>
-                        <input type="text" class="form-control" value="123 Lê Lợi, TP.HCM">
-                    </div>
-                    <div class="mb-3">
-                        <label>Điện thoại</label>
-                        <input type="text" class="form-control" value="0123456789">
-                    </div>
-                    <div class="mb-3">
-                        <label>Giờ mở cửa</label>
-                        <input type="text" class="form-control" value="07:00">
-                    </div>
-                    <div class="mb-3">
-                        <label>Giờ đóng cửa</label>
-                        <input type="text" class="form-control" value="22:00">
-                    </div>
+                    <input type="hidden" name="Id" id="edit-store-id">
+                    <div class="mb-3"><label>Tên cửa hàng</label><input type="text" class="form-control" name="StoreName" id="edit-store-name"></div>
+                    <div class="mb-3"><label>Địa chỉ</label><input type="text" class="form-control" name="Address" id="edit-store-address"></div>
+                    <div class="mb-3"><label>Điện thoại</label><input type="text" class="form-control" name="Phone" id="edit-store-phone"></div>
+                    <div class="mb-3"><label>Giờ mở cửa</label><input type="text" class="form-control" name="OpenTime" id="edit-store-open"></div>
+                    <div class="mb-3"><label>Giờ đóng cửa</label><input type="text" class="form-control" name="CloseTime" id="edit-store-close"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -204,7 +200,7 @@
     </div>
 
     <!-- View Modal -->
-    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -212,11 +208,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p><strong>Tên cửa hàng:</strong> Cửa hàng Trung Nguyên 1</p>
-                    <p><strong>Địa chỉ:</strong> 123 Lê Lợi, TP.HCM</p>
-                    <p><strong>Điện thoại:</strong> 0123456789</p>
-                    <p><strong>Giờ mở cửa:</strong> 07:00</p>
-                    <p><strong>Giờ đóng cửa:</strong> 22:00</p>
+                    <p><strong>Mã cửa hàng:</strong> <span id="view-id"></span></p>
+                    <p><strong>Tên cửa hàng:</strong> <span id="view-name"></span></p>
+                    <p><strong>Địa chỉ:</strong> <span id="view-address"></span></p>
+                    <p><strong>Điện thoại:</strong> <span id="view-phone"></span></p>
+                    <p><strong>Giờ mở cửa:</strong> <span id="view-open"></span></p>
+                    <p><strong>Giờ đóng cửa:</strong> <span id="view-close"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -226,25 +223,73 @@
     </div>
 
     <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <form class="modal-content" method="POST" action="process_delete.php">
                 <div class="modal-header">
                     <h5 class="modal-title text-danger">Xóa cửa hàng</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa cửa hàng này không?
+                    Bạn có chắc chắn muốn xóa cửa hàng này?
+                    <input type="hidden" name="Id" id="delete-store-id">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const storesData = <?= $storesJson ?>;
+
+        function fillViewModal(store) {
+            document.getElementById('view-id').innerText = store.Id;
+            document.getElementById('view-name').innerText = store.StoreName;
+            document.getElementById('view-address').innerText = store.Address;
+            document.getElementById('view-phone').innerText = store.Phone;
+            document.getElementById('view-open').innerText = store.OpenTime;
+            document.getElementById('view-close').innerText = store.CloseTime;
+        }
+
+        function fillEditModal(store) {
+            document.getElementById('edit-store-id').value = store.Id;
+            document.getElementById('edit-store-name').value = store.StoreName;
+            document.getElementById('edit-store-address').value = store.Address;
+            document.getElementById('edit-store-phone').value = store.Phone;
+            document.getElementById('edit-store-open').value = store.OpenTime;
+            document.getElementById('edit-store-close').value = store.CloseTime;
+        }
+
+        const modals = ['viewModal', 'editModal', 'deleteModal'];
+        modals.forEach(id => {
+            const modalEl = document.getElementById(id);
+            modalEl.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const storeId = button.getAttribute('data-bs-id');
+                const store = storesData.find(s => s.Id == storeId);
+                if (!store) return;
+
+                if (id === 'viewModal') fillViewModal(store);
+                if (id === 'editModal') fillEditModal(store);
+                if (id === 'deleteModal') document.getElementById('delete-store-id').value = store.Id;
+
+                // White backdrop
+                const backdrop = document.createElement('div');
+                backdrop.classList.add('modal-backdrop-white');
+                document.body.appendChild(backdrop);
+            });
+
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                const backdrop = document.querySelector('.modal-backdrop-white');
+                if (backdrop) backdrop.remove();
+            });
+        });
+    </script>
 </body>
 
 </html>

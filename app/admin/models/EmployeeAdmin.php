@@ -1,9 +1,9 @@
 <?php
-    class EmployeeAdmin{
-        public $Id;
-        public $Name;
-        public $StoreId;
-        public $RoleId;
-        public $Salary;
-    }
-?>
+class EmployeeAdmin
+{
+    public $Id;
+    public $FullName;
+    public $StoreId;
+    public $RoleId;
+    public $Salary;
+}

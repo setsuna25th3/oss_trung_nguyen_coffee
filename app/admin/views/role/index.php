@@ -1,3 +1,29 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Kiểm tra quyền admin
+if (!isset($_SESSION['CustomerId'])) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
+
+require_once __DIR__ . '/../../../controllers/CustomerController.php';
+require_once __DIR__ . '/../../controllers/RoleAdminController.php';
+
+$customerController = new CustomerController();
+$customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+
+if (!$customer || !$customer->Role) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
+
+$roleController = new RoleAdminController();
+$roles = $roleController->getAllRoles();
+$rolesJson = json_encode($roles, JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="vi">
 
@@ -43,14 +69,22 @@
             margin-bottom: 15px;
         }
 
-        .pagination .btn {
-            min-width: 40px;
-        }
-
-        @media (max-width: 768px) {
+        @media (max-width:768px) {
             .table-responsive {
                 overflow-x: auto;
             }
+        }
+
+        .modal-backdrop-white {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1050;
+            width: 100vw;
+            height: 100vh;
+            background-color: #fff;
+            opacity: 0.8;
+            transition: opacity 0.15s linear;
         }
     </style>
 </head>
@@ -64,75 +98,51 @@
                 <button class="btn btn-success btn-add" data-bs-toggle="modal" data-bs-target="#createModal">
                     <i class="fa fa-plus"></i> Thêm chức vụ
                 </button>
-                <div class="d-flex">
-                    <input type="text" class="form-control me-2" placeholder="Tìm kiếm chức vụ...">
-                    <button class="btn btn-primary">Tìm kiếm</button>
-                    <button class="btn btn-outline-dark ms-2">Quay lại danh sách</button>
-                </div>
             </div>
 
             <div class="table-responsive">
                 <table class="table table-bordered table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Mã</th>
+                            <th>Mã chức vụ</th>
                             <th>Tên chức vụ</th>
                             <th>Hành động</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Dữ liệu mẫu -->
-                        <tr>
-                            <td>1</td>
-                            <td>Quản lý</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    <i class="fa fa-trash"></i>Xóa
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Nhân viên bán hàng</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal">
-                                    <i class="fa fa-edit"></i>Sửa
-                                </button>
-                                <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                    <i class="fa fa-trash"></i>Xóa
-                                </button>
-                            </td>
-                        </tr>
+                        <?php if (!empty($roles)): ?>
+                            <?php foreach ($roles as $role): ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($role->Id) ?></td>
+                                    <td><?= htmlspecialchars($role->RoleName) ?></td>
+                                    <td>
+                                        <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewModal" data-bs-id="<?= $role->Id ?>"><i class="fa fa-eye"></i></button>
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" data-bs-id="<?= $role->Id ?>"><i class="fa fa-edit"></i></button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="<?= $role->Id ?>"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="3" class="text-center">Không có chức vụ nào.</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- Phân trang -->
-            <div class="d-flex justify-content-center mt-4">
-                <button class="btn btn-outline-dark mx-1">&laquo;</button>
-                <button class="btn btn-outline-dark active mx-1">1</button>
-                <button class="btn btn-outline-dark mx-1">2</button>
-                <button class="btn btn-outline-dark mx-1">&raquo;</button>
             </div>
         </div>
     </div>
 
     <!-- Create Modal -->
-    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="createModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_create.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Thêm chức vụ mới</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Tên chức vụ</label>
-                        <input type="text" class="form-control" placeholder="Nhập tên chức vụ">
-                    </div>
+                    <div class="mb-3"><label>Tên chức vụ</label><input type="text" class="form-control" name="RoleName" required></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -143,18 +153,16 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content">
+            <form class="modal-content" method="POST" action="process_edit.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa chức vụ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label>Tên chức vụ</label>
-                        <input type="text" class="form-control" value="Quản lý">
-                    </div>
+                    <input type="hidden" name="Id" id="edit-role-id">
+                    <div class="mb-3"><label>Tên chức vụ</label><input type="text" class="form-control" name="RoleName" id="edit-role-name" required></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -164,26 +172,84 @@
         </div>
     </div>
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <!-- View Modal -->
+    <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title text-danger">Xóa chức vụ</h5>
+                    <h5 class="modal-title">Chi tiết chức vụ</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    Bạn có chắc chắn muốn xóa chức vụ này không?
+                    <p><strong>Mã chức vụ:</strong> <span id="view-id"></span></p>
+                    <p><strong>Tên chức vụ:</strong> <span id="view-name"></span></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="button" class="btn btn-danger">Xóa</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
+        <div class="modal-dialog">
+            <form class="modal-content" method="POST" action="process_delete.php">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Xóa chức vụ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc chắn muốn xóa chức vụ này?
+                    <input type="hidden" name="Id" id="delete-role-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const rolesData = <?= $rolesJson ?>;
+
+        function fillViewModal(role) {
+            document.getElementById('view-id').innerText = role.Id;
+            document.getElementById('view-name').innerText = role.RoleName;
+        }
+
+        function fillEditModal(role) {
+            document.getElementById('edit-role-id').value = role.Id;
+            document.getElementById('edit-role-name').value = role.RoleName;
+        }
+
+        const modals = ['viewModal', 'editModal', 'deleteModal'];
+        modals.forEach(id => {
+            const modalEl = document.getElementById(id);
+            modalEl.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const roleId = button.getAttribute('data-bs-id');
+                const role = rolesData.find(r => r.Id == roleId);
+                if (!role) return;
+
+                if (id === 'viewModal') fillViewModal(role);
+                if (id === 'editModal') fillEditModal(role);
+                if (id === 'deleteModal') document.getElementById('delete-role-id').value = role.Id;
+
+                // White backdrop
+                const backdrop = document.createElement('div');
+                backdrop.classList.add('modal-backdrop-white');
+                document.body.appendChild(backdrop);
+            });
+
+            modalEl.addEventListener('hidden.bs.modal', () => {
+                const backdrop = document.querySelector('.modal-backdrop-white');
+                if (backdrop) backdrop.remove();
+            });
+        });
+    </script>
 </body>
 
 </html>

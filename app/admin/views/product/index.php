@@ -1,30 +1,30 @@
 <?php
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-    if (!isset($_SESSION['CustomerId'])) {
-        header('Location: ../../../views/home/index.php');
-        exit();
-    }
+if (!isset($_SESSION['CustomerId'])) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
 
-    require_once __DIR__ . '/../../../controllers/CustomerController.php';
-    $customerController = new CustomerController();
+require_once __DIR__ . '/../../../controllers/CustomerController.php';
+$customerController = new CustomerController();
 
-    $customer = $customerController->getCustomerById($_SESSION['CustomerId']);
-    $productAdmins = [];
+$customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+$productAdmins = [];
 
-    if ($customer && $customer->Role) {
-        require_once __DIR__ . '/../../controllers/ProductAdminController.php'; 
+if ($customer && $customer->Role) {
+    require_once __DIR__ . '/../../controllers/ProductAdminController.php';
 
-        $productAdminController = new ProductAdminController();
-        $productAdmins = $productAdminController->getAllProducts(0);
-    } else {
-        header('Location: ../../../views/home/index.php');
-        exit();
-    }
+    $productAdminController = new ProductAdminController();
+    $productAdmins = $productAdminController->getAllProducts(0);
+} else {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
 
-    $productsJson = json_encode($productAdmins, JSON_UNESCAPED_UNICODE);
+$productsJson = json_encode($productAdmins, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -100,11 +100,11 @@
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 1050; 
+            z-index: 1050;
             width: 100vw;
             height: 100vh;
-            background-color: #ffffff; 
-            opacity: 0.8; 
+            background-color: #ffffff;
+            opacity: 0.8;
             transition: opacity 0.15s linear;
         }
     </style>
@@ -145,7 +145,7 @@
                     </thead>
                     <tbody>
                         <?php if (!empty($productAdmins)): ?>
-                            <?php foreach($productAdmins as $product): ?>
+                            <?php foreach ($productAdmins as $product): ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($product->Id); ?></td>
                                     <td><?php echo htmlspecialchars($product->Title); ?></td>
@@ -221,13 +221,13 @@
 
     <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
-            <form class="modal-content" method="POST" action="process_edit.php"> 
+            <form class="modal-content" method="POST" action="process_edit.php">
                 <div class="modal-header">
                     <h5 class="modal-title">Sửa sản phẩm</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="productId" id="edit-product-id"> 
+                    <input type="hidden" name="productId" id="edit-product-id">
                     <div class="mb-3">
                         <label for="edit-title">Tên sản phẩm</label>
                         <input type="text" class="form-control" id="edit-title" name="title">
@@ -238,11 +238,11 @@
                     </div>
                     <div class="mb-3">
                         <label for="edit-price">Giá</label>
-                        <input type="number" class="form-control" id="edit-price" name="price" min="0"> 
+                        <input type="number" class="form-control" id="edit-price" name="price" min="0">
                     </div>
                     <div class="mb-3">
                         <label for="edit-category-id">Mã danh mục</label>
-                        <input type="number" class="form-control" id="edit-category-id" name="category_id"> 
+                        <input type="number" class="form-control" id="edit-category-id" name="category_id">
                     </div>
                     <div class="mb-3">
                         <label for="edit-image-file">Hình ảnh (Để trống nếu không thay đổi)</label>
@@ -287,14 +287,17 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         const productsData = <?php echo $productsJson; ?>;
 
         const IMG_BASE_PATH = '/oss_trung_nguyen_coffee/app/img/SanPham/';
 
         function formatCurrency(number) {
-            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(number);
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(number);
         }
 
         function formatDate(dateString) {
@@ -311,7 +314,7 @@
 
         const viewModal = document.getElementById('viewModal');
         const editModal = document.getElementById('editModal');
-        const createModal = document.getElementById('createModal'); 
+        const createModal = document.getElementById('createModal');
 
         const modalElements = [createModal, viewModal, editModal];
 
@@ -329,13 +332,13 @@
         }
 
         modalElements.forEach(modalElement => {
-            modalElement.addEventListener('show.bs.modal', function (event) {
+            modalElement.addEventListener('show.bs.modal', function(event) {
                 showWhiteBackdrop();
 
                 const button = event.relatedTarget;
                 if (button) {
-                    const productId = button.getAttribute('data-bs-id'); 
-                    
+                    const productId = button.getAttribute('data-bs-id');
+
                     const product = productsData.find(p => p.Id == productId);
 
                     if (!product) {
@@ -360,14 +363,14 @@
                         document.getElementById('edit-product-id').value = product.Id;
                         document.getElementById('edit-title').value = product.Title;
                         document.getElementById('edit-content').value = product.Content;
-                        document.getElementById('edit-price').value = product.Price; 
+                        document.getElementById('edit-price').value = product.Price;
                         document.getElementById('edit-category-id').value = product.CategoryId;
                         document.getElementById('edit-current-img').src = IMG_BASE_PATH + product.Img;
                     }
                 }
             });
 
-            modalElement.addEventListener('hidden.bs.modal', function () {
+            modalElement.addEventListener('hidden.bs.modal', function() {
                 removeWhiteBackdrop();
             });
         });

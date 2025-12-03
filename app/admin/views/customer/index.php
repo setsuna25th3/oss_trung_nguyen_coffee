@@ -1,31 +1,30 @@
 <?php
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
-    if (!isset($_SESSION['CustomerId'])) {
-        header('Location: ../../../views/home/index.php');
-        exit();
-    }
+if (!isset($_SESSION['CustomerId'])) {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
 
-    require_once __DIR__ . '/../../../controllers/CustomerController.php';
-    $customerController = new CustomerController();
+require_once __DIR__ . '/../../../controllers/CustomerController.php';
+$customerController = new CustomerController();
 
-    $customer = $customerController->getCustomerById($_SESSION['CustomerId']);
-    $customerAdmins = [];
+$customer = $customerController->getCustomerById($_SESSION['CustomerId']);
+$customerAdmins = [];
 
-    if ($customer && $customer->Role) {
-        require_once __DIR__ . '/../../controllers/CustomerAdminController.php'; 
+if ($customer && $customer->Role) {
+    require_once __DIR__ . '/../../controllers/CustomerAdminController.php';
 
-        $customerAdminController = new CustomerAdminController();
-        $customerAdmins = $customerAdminController->getAllCustomers();
+    $customerAdminController = new CustomerAdminController();
+    $customerAdmins = $customerAdminController->getAllCustomers();
+} else {
+    header('Location: ../../../views/home/index.php');
+    exit();
+}
 
-    } else {
-        header('Location: ../../../views/home/index.php');
-        exit();
-    }
-
-    $customersJson = json_encode($customerAdmins, JSON_UNESCAPED_UNICODE);
+$customersJson = json_encode($customerAdmins, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -84,16 +83,16 @@
                 overflow-x: auto;
             }
         }
-        
+
         .modal-backdrop-white {
             position: fixed;
             top: 0;
             left: 0;
-            z-index: 1050; 
+            z-index: 1050;
             width: 100vw;
             height: 100vh;
-            background-color: #ffffff; 
-            opacity: 0.8; 
+            background-color: #ffffff;
+            opacity: 0.8;
             transition: opacity 0.15s linear;
         }
     </style>
@@ -133,7 +132,7 @@
                     </thead>
                     <tbody>
                         <?php if (!empty($customerAdmins)): ?>
-                            <?php foreach($customerAdmins as $cust): 
+                            <?php foreach ($customerAdmins as $cust):
                                 $fullName = htmlspecialchars($cust->LastName . ' ' . $cust->FirstName);
                                 $statusClass = $cust->IsActive ? 'text-success' : 'text-danger';
                                 $statusText = $cust->IsActive ? 'Hoạt động' : 'Đã khóa';
@@ -146,8 +145,8 @@
                                     <td><?php echo htmlspecialchars($cust->Address); ?></td>
                                     <td><?php echo htmlspecialchars($cust->DateOfBirth); ?></td>
                                     <td>
-                                        <img src="/oss_trung_nguyen_coffee/app/img/KhachHang/<?php echo md5($cust->Email) . "/" . htmlspecialchars($cust->Img); ?>" 
-                                             alt="<?php echo $fullName; ?>" class="img-avatar" />
+                                        <img src="/oss_trung_nguyen_coffee/app/img/KhachHang/<?php echo md5($cust->Email) . "/" . htmlspecialchars($cust->Img); ?>"
+                                            alt="<?php echo $fullName; ?>" class="img-avatar" />
                                     </td>
                                     <td class="<?php echo $statusClass; ?>"><?php echo $statusText; ?></td>
                                     <td><?php echo date('d/m/Y H:i:s', strtotime($cust->RegisteredAt)); ?></td>
@@ -302,7 +301,7 @@
             </div>
         </div>
     </div>
-<!-- 
+    <!-- 
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -322,7 +321,7 @@
     </div> -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         const customersData = <?php echo $customersJson; ?>;
 
@@ -330,8 +329,8 @@
 
         function formatDate(dateString) {
             const date = new Date(dateString);
-            if (dateString.length > 10) { 
-                 return date.toLocaleDateString('vi-VN', {
+            if (dateString.length > 10) {
+                return date.toLocaleDateString('vi-VN', {
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric',
@@ -340,9 +339,13 @@
                     second: '2-digit'
                 });
             }
-            return date.toLocaleDateString('vi-VN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+            return date.toLocaleDateString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
         }
-        
+
         function formatStatus(isActive) {
             return isActive == 1 ? 'Hoạt động' : 'Đã khóa';
         }
@@ -368,12 +371,12 @@
         }
 
         modalElements.forEach(modalElement => {
-            modalElement.addEventListener('show.bs.modal', function (event) {
+            modalElement.addEventListener('show.bs.modal', function(event) {
                 showWhiteBackdrop();
 
-                const button = event.relatedTarget; 
+                const button = event.relatedTarget;
                 const customerId = button ? button.getAttribute('data-bs-id') : null;
-                
+
                 if (customerId) {
                     const customer = customersData.find(c => c.Id == customerId);
 
@@ -381,7 +384,7 @@
                         console.error('Không tìm thấy khách hàng với ID:', customerId);
                         return;
                     }
-                    
+
                     const fullName = customer.LastName + ' ' + customer.FirstName;
 
                     if (modalElement.id === 'viewModal') {
@@ -392,7 +395,7 @@
                         document.getElementById('view-address').innerText = customer.Address;
                         document.getElementById('view-dob').innerText = formatDate(customer.DateOfBirth);
                         document.getElementById('view-registered-at').innerText = formatDate(customer.RegisteredAt);
-                        
+
                         const statusSpan = document.getElementById('view-is-active');
                         statusSpan.innerText = formatStatus(customer.IsActive);
                         statusSpan.classList.toggle('text-success', customer.IsActive == 1);
@@ -408,11 +411,11 @@
                         document.getElementById('edit-email').value = customer.Email;
                         document.getElementById('edit-phone').value = customer.Phone;
                         document.getElementById('edit-address').value = customer.Address;
-                        document.getElementById('edit-dob').value = customer.DateOfBirth; 
+                        document.getElementById('edit-dob').value = customer.DateOfBirth;
                         document.getElementById('edit-current-img').src = IMG_BASE_PATH + customer.Img;
-                        document.getElementById('edit-is-active').value = customer.IsActive; 
+                        document.getElementById('edit-is-active').value = customer.IsActive;
                     }
-                    
+
                     // if (modalElement.id === 'deleteModal') {
                     //     document.getElementById('delete-id-display').innerText = customer.Id;
                     //     document.getElementById('delete-full-name-display').innerText = fullName;
@@ -421,7 +424,7 @@
                 }
             });
 
-            modalElement.addEventListener('hidden.bs.modal', function () {
+            modalElement.addEventListener('hidden.bs.modal', function() {
                 removeWhiteBackdrop();
             });
         });
