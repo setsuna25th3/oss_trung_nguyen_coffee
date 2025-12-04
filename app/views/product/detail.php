@@ -2,6 +2,7 @@
     session_start();
     require_once '../../controllers/ProductController.php';
     require_once '../../controllers/CategoryController.php';
+    require_once '../../controllers/ReviewController.php';
     
     $productController = new ProductController();
     $categoryController = new CategoryController();
